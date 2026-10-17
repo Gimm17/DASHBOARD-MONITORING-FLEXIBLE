@@ -43,3 +43,8 @@ dist-ssr/
 .env
 .env.*
 !.env.example
+backend/public/spa/
+test-results/
+playwright-report/
+tmp/
+release/

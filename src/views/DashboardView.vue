@@ -1,318 +1,333 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
-import StatCard from '../components/StatCard.vue'
-import HeroSplineChart from '../components/HeroSplineChart.vue'
-import WeeklyActivityChart from '../components/WeeklyActivityChart.vue'
-import SpeedometerGauge from '../components/SpeedometerGauge.vue'
-import AiAssistantCard from '../components/AiAssistantCard.vue'
-import SlideOverAddWidget from '../components/SlideOverAddWidget.vue'
-import { mockActivities } from '../data/mockData'
-
-const router = useRouter()
-
-const isAddWidgetOpen = ref(false)
-const selectedTeam = ref('Semua Tim')
-const searchQuery = ref('')
-const selectedYear = ref('2026')
-
-const teams = ['Semua Tim', 'Statistik Sosial', 'Statistik Produksi', 'Statistik Distribusi', 'Nerwilis']
-
-const filteredActivities = computed(() => {
-  return mockActivities.filter((act) => {
-    const matchTeam = selectedTeam.value === 'Semua Tim' || act.team === selectedTeam.value
-    const matchQuery =
-      act.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      act.code.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      act.pjk.toLowerCase().includes(searchQuery.value.toLowerCase())
-    return matchTeam && matchQuery
-  })
-})
-
-const exportData = () => {
-  alert('Mengunduh rekap kinerja kegiatan monitoring (XLSX)...')
+import { ref, computed, onMounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import StatCard from "../components/StatCard.vue";
+import HeroSplineChart from "../components/HeroSplineChart.vue";
+import WeeklyActivityChart from "../components/WeeklyActivityChart.vue";
+import SpeedometerGauge from "../components/SpeedometerGauge.vue";
+import {
+  api,
+  session,
+  errorText,
+  number,
+  type Activity,
+} from "../services/api";
+const router = useRouter(),
+  route = useRoute();
+const data = ref<any>(null),
+  error = ref(""),
+  busy = ref(false);
+const year = ref(Number(route.query.year || new Date().getFullYear())),
+  team = ref(String(route.query.team_id || "")),
+  region = ref(String(route.query.region_id || "")),
+  search = ref(String(route.query.q || ""));
+const teams = ref<any[]>([]);
+const regions = ref<any[]>([]);
+const canCreate = computed(() =>
+  session.user?.assignments.some((a) => ["admin", "pjk"].includes(a.role)),
+);
+const activities = computed<Activity[]>(() =>
+  (data.value?.activities || []).filter((a: Activity) =>
+    (a.title + " " + a.code + " " + a.pjk)
+      .toLowerCase()
+      .includes(search.value.toLowerCase()),
+  ),
+);
+const summary = computed(() => data.value?.summary || {});
+async function load() {
+  busy.value = true;
+  error.value = "";
+  const params = new URLSearchParams({ year: String(year.value) });
+  if (team.value) params.set("team_id", team.value);
+  if (region.value) params.set("region_id", region.value);
+  if (route.query.status) params.set("status", String(route.query.status));
+  if (route.query.page) params.set("page", String(route.query.page));
+  try {
+    data.value = await api("dashboard?" + params);
+    const references = await api("references");
+    teams.value = references.teams;
+    regions.value = references.regions;
+  } catch (e) {
+    error.value = errorText(e);
+  } finally {
+    busy.value = false;
+  }
+}
+onMounted(load);
+function changeFilters() {
+  router.replace({
+    path: route.path,
+    query: {
+      ...route.query,
+      year: String(year.value),
+      team_id: team.value || undefined,
+      region_id: region.value || undefined,
+      page: undefined,
+    },
+  });
+}
+function open(id: number) {
+  router.push({ path: "/matriks", query: { activity: id } });
+}
+function exportData() {
+  window.location.href =
+    "/api/export?" +
+    new URLSearchParams({
+      year: String(year.value),
+      ...(team.value ? { team_id: team.value } : {}),
+      ...(region.value ? { region_id: region.value } : {}),
+      ...(route.query.status ? { status: String(route.query.status) } : {}),
+    });
 }
 </script>
-
 <template>
   <div class="space-y-6">
-    <!-- Page Header (Shopeers Style) -->
-    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+    <div class="flex flex-wrap justify-between gap-4 items-center">
       <div>
-        <h1 class="font-outfit text-[26px] font-bold text-text-title tracking-tight leading-none">
-          Dashboard Monitoring Eksekutif
+        <h1 class="font-outfit text-[26px] font-bold text-text-title">
+          {{
+            route.path === "/wilayah"
+              ? "Monitoring per Wilayah"
+              : "Dashboard Monitoring Eksekutif"
+          }}
         </h1>
-        <p class="font-manrope text-[13px] text-text-muted mt-1.5">
-          Pemantauan Capaian Target, Evaluasi Berkala, &amp; Partisipasi BPS Kabupaten/Kota
+        <p class="text-[13px] text-text-muted">
+          Target, realisasi, dan kelengkapan pelaporan kabupaten/kota
         </p>
       </div>
-
-      <!-- Right Header Actions (Shopeers Style) -->
-      <div class="flex flex-wrap items-center gap-2.5">
-        <!-- Date Range Pill -->
-        <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-[#EAEFF5] text-[12px] font-manrope font-semibold text-text-body shadow-xs">
-          <span class="material-symbols-outlined text-[16px] text-text-muted">calendar_today</span>
-          <span>01 Jan 2026 – 31 Des 2026</span>
-          <span class="text-slate-300">|</span>
-          <select v-model="selectedYear" class="bg-transparent font-bold text-brand-navy focus:outline-none cursor-pointer">
-            <option value="2026">Tahun 2026</option>
-            <option value="2025">Tahun 2025</option>
-          </select>
-        </div>
-
-        <!-- Add Widget Drawer Button -->
-        <button
-          @click="isAddWidgetOpen = true"
-          class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white border border-[#EAEFF5] text-[12px] font-manrope font-semibold text-text-body hover:border-brand-slate hover:bg-[#F6F8FB] transition-all shadow-xs"
+      <div class="flex gap-2">
+        <input
+          v-model="year"
+          type="number"
+          min="2020"
+          max="2100"
+          aria-label="Tahun pelaporan"
+          class="field !w-24 !mt-0"
+          @change="changeFilters"
+        /><button
+          v-if="canCreate"
+          class="btn-primary"
+          @click="router.push('/kegiatan/baru')"
         >
-          <span class="material-symbols-outlined text-[16px] text-brand-slate">add_circle</span>
-          <span>Tambah Widget</span>
-        </button>
-
-        <!-- Primary Export CTA -->
-        <button
-          @click="exportData"
-          class="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-brand-navy text-white text-[12px] font-manrope font-bold hover:bg-brand-navy-dark transition-all shadow-sm active:scale-95"
-        >
-          <span class="material-symbols-outlined text-[16px]">file_download</span>
-          <span>Ekspor Data</span>
-        </button>
+          + Kegiatan</button
+        ><button class="btn-secondary" @click="exportData">Ekspor CSV</button>
       </div>
     </div>
-
-    <!-- Alert / Attention Banner for Lagging Regions -->
-    <div class="p-3.5 px-5 rounded-2xl bg-[#FFF8EE] border border-brand-amber/40 flex items-center justify-between shadow-xs">
-      <div class="flex items-center gap-3">
-        <span class="material-symbols-outlined text-brand-amber-deep text-[22px]">notification_important</span>
-        <div class="text-[12px] font-manrope text-text-title">
-          <strong class="font-bold text-brand-navy">Perhatian Khusus:</strong>
-          Terdapat <strong>2 Satker</strong> dengan ketertinggalan pengiriman data Sakernas (Kab. Muna &amp; Kab. Bombana).
+    <p v-if="error" role="alert" class="notice error">
+      {{ error }} <button class="underline" @click="load">Coba lagi</button>
+    </p>
+    <p v-if="busy" role="status" class="notice">Memuat data monitoring…</p>
+    <template v-if="data">
+      <div v-if="summary.missing" class="notice flex justify-between gap-3">
+        <span
+          ><strong>Perhatian:</strong> {{ number(summary.missing) }} unit
+          evaluasi belum memiliki laporan pada periode yang telah tiba.</span
+        ><router-link
+          :to="{
+            path: route.path,
+            query: {
+              ...route.query,
+              status: 'BELUM_ADA_DATA',
+              page: undefined,
+            },
+          }"
+          class="font-bold underline"
+          >Lihat</router-link
+        >
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <StatCard
+          title="Total Kegiatan Aktif"
+          :value="number(summary.active)"
+          subValue="Kegiatan"
+          icon="assignment"
+        />
+        <StatCard
+          title="Tingkat Ketercapaian Target"
+          :value="summary.rate === null ? '—' : number(summary.rate) + '%'"
+          :subValue="summary.attained + ' / ' + summary.total + ' unit'"
+          icon="check_circle"
+        />
+        <StatCard
+          title="Evaluasi Di Bawah Target"
+          :value="number(summary.below)"
+          subValue="Unit evaluasi"
+          :isWarning="true"
+          icon="warning"
+        />
+        <StatCard
+          title="Laporan Belum Tersedia"
+          :value="number(summary.missing)"
+          subValue="Kosong berbeda dari nol"
+          icon="pending_actions"
+        />
+      </div>
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-5">
+        <HeroSplineChart class="xl:col-span-2" :trend="data.trend" />
+        <div class="space-y-5">
+          <WeeklyActivityChart :days="data.weekly" /><SpeedometerGauge
+            :rate="summary.coverage"
+            :reported="summary.total - summary.missing"
+            :total="summary.total"
+            :target="100"
+          />
         </div>
       </div>
-      <button
-        @click="router.push('/matriks')"
-        class="text-[12px] font-bold font-manrope text-brand-navy hover:underline flex items-center gap-1 shrink-0"
-      >
-        Tindak Lanjuti
-        <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
-      </button>
-    </div>
-
-    <!-- ROW 1: 4 Stat Cards KPI (Shopeers Inspired) -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-      <StatCard
-        title="Total Kegiatan Aktif"
-        value="42"
-        subValue="Kegiatan"
-        trend="+4 bulan ini"
-        :isPositive="true"
-        icon="assignment"
-        iconBgColor="bg-brand-navy-subtle"
-        iconColor="text-brand-navy"
-      />
-
-      <StatCard
-        title="Tingkat Ketercapaian Target"
-        value="78.4%"
-        subValue="312 / 398 Unit"
-        trend="+2.6% vs periode lalu"
-        :isPositive="true"
-        icon="check_circle"
-        iconBgColor="bg-[#EAF8EE]"
-        iconColor="text-[#1E824C]"
-      />
-
-      <StatCard
-        title="Evaluasi Di Bawah Target"
-        value="66"
-        subValue="Unit Evaluasi"
-        trend="16.6% butuh tindak lanjut"
-        :isWarning="true"
-        icon="warning"
-        iconBgColor="bg-[#FFF7EC]"
-        iconColor="text-[#B45309]"
-      />
-
-      <StatCard
-        title="Laporan Belum Masuk"
-        value="20"
-        subValue="Wilayah Partisipan"
-        trend="5.0% jatuh tempo"
-        :isPositive="false"
-        icon="pending_actions"
-        iconBgColor="bg-[#FEEEEE]"
-        iconColor="text-[#C53030]"
-      />
-    </div>
-
-    <!-- ROW 2: Analytics Split Section (Shopeers Inspired) -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-      <!-- Left Hero Card (8 Cols): Spline Area Chart -->
-      <div class="lg:col-span-8">
-        <HeroSplineChart />
-      </div>
-
-      <!-- Right Column Widgets (4 Cols): Weekly Activity, Speedometer Gauge, AI Assistant -->
-      <div class="lg:col-span-4 flex flex-col gap-5">
-        <SpeedometerGauge />
-        <WeeklyActivityChart />
-        <AiAssistantCard />
-      </div>
-    </div>
-
-    <!-- ROW 3: Data-Dense Table Card ("Kinerja Kegiatan Monitoring & Partisipasi") -->
-    <div class="shoppers-card p-6">
-      <!-- Table Header & Controls -->
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-5">
+      <div class="shoppers-card p-5 flex flex-wrap justify-between gap-3">
         <div>
-          <h3 class="font-outfit text-[17px] font-bold text-text-title leading-tight">
-            Kinerja Kegiatan Monitoring &amp; Partisipasi Wilayah
-          </h3>
-          <p class="font-manrope text-[12px] text-text-muted mt-0.5">
-            Daftar survei dan pendataan rutin tingkat BPS Provinsi tahun 2026
+          <strong class="text-brand-navy">Ringkasan monitoring</strong>
+          <p class="text-sm text-text-muted mt-1">
+            {{ summary.attained }} dari {{ summary.total }} evaluasi wajib
+            mencapai target. Kelengkapan laporan
+            {{ number(summary.coverage) }}%.
+            {{
+              data.is_provisional
+                ? "Masih mencakup hasil sementara."
+                : "Hasil evaluasi telah final."
+            }}
           </p>
         </div>
-
-        <div class="flex items-center gap-3">
-          <!-- Team Filter Dropdown -->
-          <select
-            v-model="selectedTeam"
-            class="bg-[#F6F8FB] border border-[#EAEFF5] rounded-xl px-3 py-1.5 text-[12px] font-manrope font-semibold text-text-body focus:outline-none focus:border-brand-navy cursor-pointer"
-          >
-            <option v-for="team in teams" :key="team" :value="team">{{ team }}</option>
-          </select>
-
-          <!-- Search Input in Table -->
-          <div class="relative w-[200px]">
+        <span class="text-xs text-text-muted">Status diperiksa dalam WITA</span>
+      </div>
+      <div class="shoppers-card overflow-hidden">
+        <div class="p-5 flex flex-wrap justify-between gap-3 items-center">
+          <h2 class="font-outfit font-bold text-lg text-brand-navy">
+            Kinerja Kegiatan dan Wilayah
+          </h2>
+          <div class="flex flex-wrap gap-3">
             <input
-              v-model="searchQuery"
-              type="text"
-              placeholder="Filter kegiatan..."
-              class="w-full bg-[#F6F8FB] border border-[#EAEFF5] rounded-xl py-1.5 pl-8 pr-3 text-[12px] font-manrope text-text-title placeholder:text-text-muted focus:outline-none focus:border-brand-navy"
-            />
-            <span class="material-symbols-outlined text-[16px] text-text-muted absolute left-2.5 top-1/2 -translate-y-1/2">
-              search
-            </span>
+              v-model="search"
+              aria-label="Cari kegiatan"
+              placeholder="Cari kegiatan…"
+              class="field !mt-0"
+            /><select
+              v-model="team"
+              aria-label="Filter tim"
+              class="field !mt-0"
+              @change="changeFilters"
+            >
+              <option value="">Semua tim</option>
+              <option v-for="t in teams" :key="t.id" :value="t.id">
+                {{ t.name }}
+              </option>
+            </select>
+            <select
+              v-model="region"
+              aria-label="Filter wilayah"
+              class="field !mt-0"
+              @change="changeFilters"
+            >
+              <option value="">Semua wilayah</option>
+              <option v-for="r in regions" :key="r.id" :value="String(r.id)">
+                {{ r.name }}
+              </option>
+            </select>
           </div>
-
-          <button
-            @click="router.push('/matriks')"
-            class="px-3.5 py-1.5 rounded-xl border border-brand-navy text-brand-navy text-[12px] font-manrope font-bold hover:bg-brand-navy hover:text-white transition-all shadow-xs"
-          >
-            Buka Matriks Lengkap
-          </button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Kegiatan</th>
+                <th>Tim dan PJK</th>
+                <th>Status</th>
+                <th>Evaluasi tercapai</th>
+                <th>Kelengkapan laporan</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="a in activities" :key="a.id">
+                <td>
+                  <button
+                    class="font-bold text-brand-navy text-left"
+                    @click="open(a.id)"
+                  >
+                    {{ a.title }}
+                  </button>
+                  <p class="text-xs text-text-muted">
+                    {{ a.code }} · {{ a.indicator }} · {{ a.unit }}
+                  </p>
+                </td>
+                <td>
+                  {{ a.team }}
+                  <p class="text-xs text-text-muted">{{ a.pjk }}</p>
+                </td>
+                <td>
+                  <span class="badge">{{ a.status }}</span>
+                </td>
+                <td>
+                  {{ number(a.capaianPeriode)
+                  }}{{ a.capaianPeriode === null ? "" : "%" }}
+                </td>
+                <td>
+                  {{ number(a.coverageRate)
+                  }}{{ a.coverageRate === null ? "" : "%" }}
+                </td>
+                <td>
+                  <button class="btn-secondary" @click="open(a.id)">
+                    Rincian
+                  </button>
+                </td>
+              </tr>
+              <tr v-if="!activities.length">
+                <td colspan="6" class="text-center !py-12 text-text-muted">
+                  Belum ada kegiatan yang sesuai filter.
+                  {{
+                    canCreate
+                      ? "Mulai dengan membuat kegiatan monitoring."
+                      : "Hubungi penanggung jawab kegiatan."
+                  }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
-
-      <!-- Data Table -->
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="border-b border-[#EAEFF5] text-[11px] font-outfit uppercase tracking-wider text-text-muted">
-              <th class="py-3 px-3">Kode &amp; Nama Kegiatan</th>
-              <th class="py-3 px-3">Tim Kerja</th>
-              <th class="py-3 px-3">Target Akhir</th>
-              <th class="py-3 px-3">Realisasi Kini</th>
-              <th class="py-3 px-3">Progres Akhir</th>
-              <th class="py-3 px-3">Capaian Periode</th>
-              <th class="py-3 px-3">Kelengkapan</th>
-              <th class="py-3 px-3 text-right">Aksi</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-[#EAEFF5] text-[13px] font-manrope">
-            <tr
-              v-for="act in filteredActivities"
-              :key="act.id"
-              class="hover:bg-[#FBFDFE] transition-colors group cursor-pointer"
-              @click="router.push('/matriks')"
-            >
-              <!-- Name & Code -->
-              <td class="py-3.5 px-3">
-                <div class="flex items-center gap-2.5">
-                  <div class="w-8 h-8 rounded-lg bg-brand-navy-subtle text-brand-navy flex items-center justify-center font-mono font-bold text-[11px] shrink-0">
-                    {{ act.code.replace('#', '') }}
-                  </div>
-                  <div>
-                    <span class="font-outfit font-bold text-text-title block leading-snug group-hover:text-brand-navy">
-                      {{ act.title }}
-                    </span>
-                    <span class="text-[11px] text-text-muted">PJK: {{ act.pjk }}</span>
-                  </div>
-                </div>
-              </td>
-
-              <!-- Team -->
-              <td class="py-3.5 px-3">
-                <span class="px-2.5 py-1 rounded-md text-[11px] font-bold font-manrope bg-[#F2F4F7] text-text-body">
-                  {{ act.team }}
-                </span>
-              </td>
-
-              <!-- Target Akhir -->
-              <td class="py-3.5 px-3 font-mono font-bold text-text-title">
-                {{ act.targetAkhir }} <span class="font-normal text-[11px] text-text-muted">{{ act.satuan }}</span>
-              </td>
-
-              <!-- Realisasi Kini -->
-              <td class="py-3.5 px-3 font-mono font-bold" :class="act.realisasiKumulatif === 0 ? 'text-red-500' : 'text-brand-navy'">
-                {{ act.realisasiKumulatif === 0 ? '[Kosong]' : `${act.realisasiKumulatif} ${act.satuan}` }}
-              </td>
-
-              <!-- Progres Akhir (Bar) -->
-              <td class="py-3.5 px-3 min-w-[140px]">
-                <div class="flex items-center gap-2">
-                  <div class="flex-1 h-2 bg-[#F0F4F8] rounded-full overflow-hidden">
-                    <div
-                      class="h-full rounded-full transition-all duration-300"
-                      :class="act.progresAkhir >= 100 ? 'bg-[#1E824C]' : 'bg-brand-navy'"
-                      :style="{ width: `${Math.min(act.progresAkhir, 100)}%` }"
-                    ></div>
-                  </div>
-                  <span class="font-mono text-[11px] font-bold text-text-title">{{ act.progresAkhir }}%</span>
-                </div>
-              </td>
-
-              <!-- Capaian Periode (Pill) -->
-              <td class="py-3.5 px-3">
-                <span
-                  class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold font-manrope"
-                  :class="[
-                    act.capaianPeriode >= 100
-                      ? 'bg-[#EAF8EE] text-[#1E824C]'
-                      : act.capaianPeriode > 0
-                      ? 'bg-[#FFF7EC] text-[#B45309]'
-                      : 'bg-[#FEEEEE] text-[#C53030]'
-                  ]"
-                >
-                  <span class="material-symbols-outlined text-[13px]">
-                    {{ act.capaianPeriode >= 100 ? 'check' : act.capaianPeriode > 0 ? 'warning' : 'close' }}
-                  </span>
-                  {{ act.capaianPeriode }}%
-                </span>
-              </td>
-
-              <!-- Coverage Rate -->
-              <td class="py-3.5 px-3 text-[12px] font-mono font-semibold text-text-muted">
-                {{ act.coverageRate }}% Satker
-              </td>
-
-              <!-- Action Detail Button -->
-              <td class="py-3.5 px-3 text-right">
-                <button
-                  @click.stop="router.push('/matriks')"
-                  class="w-8 h-8 rounded-lg border border-[#EAEFF5] text-text-muted hover:text-brand-navy hover:bg-[#F2F4F7] inline-flex items-center justify-center transition-all"
-                  title="Lihat Detail Matriks"
-                >
-                  <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div
+        v-if="route.query.status || route.path === '/wilayah'"
+        class="shoppers-card p-5"
+      >
+        <h2 class="font-bold text-brand-navy mb-3">
+          Rincian evaluasi sesuai filter
+        </h2>
+        <div
+          v-for="u in data.units"
+          :key="u.activity_id + ':' + u.region_id + ':' + u.period_id"
+          class="border-t py-2 text-sm"
+        >
+          {{ u.activity_title }} · {{ u.region }} · {{ u.period }}
+          <span class="badge">{{ u.status.replaceAll("_", " ") }}</span>
+        </div>
+        <div class="flex gap-3 mt-4 items-center text-xs">
+          <router-link
+            v-if="data.unit_page > 1"
+            :to="{
+              path: route.path,
+              query: { ...route.query, page: data.unit_page - 1 },
+            }"
+            class="btn-secondary"
+            >Sebelumnya</router-link
+          >
+          <span
+            >{{ data.unit_total }} unit · halaman {{ data.unit_page }}/{{
+              data.unit_last_page
+            }}</span
+          >
+          <router-link
+            v-if="data.unit_page < data.unit_last_page"
+            :to="{
+              path: route.path,
+              query: { ...route.query, page: data.unit_page + 1 },
+            }"
+            class="btn-secondary"
+            >Berikutnya</router-link
+          >
+        </div>
+        <router-link to="/" class="btn-secondary mt-3"
+          >Hapus filter</router-link
+        >
       </div>
-    </div>
-
-    <!-- Slide-over Add Widget Drawer -->
-    <SlideOverAddWidget :isOpen="isAddWidgetOpen" @close="isAddWidgetOpen = false" />
+    </template>
   </div>
 </template>

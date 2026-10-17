@@ -1,47 +1,53 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import { number } from "../services/api";
 
-const router = useRouter()
+const router = useRouter();
+const route = useRoute();
 
 const props = withDefaults(
   defineProps<{
-    rate?: number
-    target?: number
+    rate?: number | null;
+    target?: number;
+    reported: number;
+    total: number;
   }>(),
   {
-    rate: 78.4,
-    target: 85,
-  }
-)
+    rate: 0,
+    target: 100,
+  },
+);
 
 // Generate 36 radial tick marks across a 180-degree semi-circle (from 180° left to 0° right)
-const totalTicks = 36
-const activeTicksCount = computed(() => Math.round((props.rate / 100) * totalTicks))
+const totalTicks = 36;
+const activeTicksCount = computed(() =>
+  Math.round(((props.rate ?? 0) / 100) * totalTicks),
+);
 
 const ticks = computed(() => {
-  const result = []
-  const cx = 100
-  const cy = 96
-  const rInner = 64
-  const rOuter = 78
+  const result = [];
+  const cx = 100;
+  const cy = 96;
+  const rInner = 64;
+  const rOuter = 78;
 
-  for (let i = 0; i <= totalTicks; i++) {
+  for (let i = 0; i < totalTicks; i++) {
     // angle from PI (180 deg, left) down to 0 (0 deg, right)
-    const angle = Math.PI - (i / totalTicks) * Math.PI
-    const x1 = cx + rInner * Math.cos(angle)
-    const y1 = cy - rInner * Math.sin(angle)
-    const x2 = cx + rOuter * Math.cos(angle)
-    const y2 = cy - rOuter * Math.sin(angle)
+    const angle = Math.PI - (i / (totalTicks - 1)) * Math.PI;
+    const x1 = cx + rInner * Math.cos(angle);
+    const y1 = cy - rInner * Math.sin(angle);
+    const x2 = cx + rOuter * Math.cos(angle);
+    const y2 = cy - rOuter * Math.sin(angle);
 
-    const isActive = i <= activeTicksCount.value
+    const isActive = i < activeTicksCount.value;
     // Color gradient effect: the last 5 active ticks get Warm Gold accent, others get Deep Navy
-    let color = '#EAEFF5'
+    let color = "#EAEFF5";
     if (isActive) {
       if (i > activeTicksCount.value - 6) {
-        color = '#FFC570' // Warm Gold Accent
+        color = "#FFC570"; // Warm Gold Accent
       } else {
-        color = '#1A3263' // Deep Navy Brand
+        color = "#1A3263"; // Deep Navy Brand
       }
     }
 
@@ -52,24 +58,27 @@ const ticks = computed(() => {
       y2,
       color,
       isActive,
-    })
+    });
   }
-  return result
-})
+  return result;
+});
 </script>
 
 <template>
-  <div class="shoppers-card p-5 flex flex-col justify-between items-center text-center">
+  <div
+    class="shoppers-card p-5 flex flex-col justify-between items-center text-center"
+  >
     <!-- Header -->
     <div class="w-full flex items-center justify-between mb-1">
-      <span class="font-manrope text-[13px] font-semibold text-text-muted">Ketercapaian Target</span>
-      <button class="text-text-muted hover:text-text-title">
-        <span class="material-symbols-outlined text-[18px]">more_horiz</span>
-      </button>
+      <span class="font-manrope text-[13px] font-semibold text-text-muted"
+        >Kelengkapan Laporan</span
+      >
     </div>
 
     <!-- Radial Speedometer Gauge (Shopeers Segmented Ticks) -->
-    <div class="relative w-[210px] h-[115px] flex items-end justify-center my-1">
+    <div
+      class="relative w-[210px] h-[115px] flex items-end justify-center my-1"
+    >
       <svg class="w-full h-full" viewBox="0 0 200 105">
         <!-- Render Segmented Radial Ticks -->
         <g>
@@ -90,25 +99,31 @@ const ticks = computed(() => {
 
       <!-- Center Metric Label -->
       <div class="absolute bottom-1 flex flex-col items-center">
-        <span class="font-outfit text-[28px] font-bold text-text-title tracking-tight leading-none">
-          {{ rate }}%
+        <span
+          class="font-outfit text-[28px] font-bold text-text-title tracking-tight leading-none"
+        >
+          {{ rate === null ? "—" : number(rate) + "%" }}
         </span>
-        <span class="font-manrope text-[11px] font-semibold text-text-muted mt-1">
-          312 dari 398 Unit
+        <span
+          class="font-manrope text-[11px] font-semibold text-text-muted mt-1"
+        >
+          {{ number(reported) }} dari {{ number(total) }} unit evaluasi
         </span>
       </div>
     </div>
 
     <!-- Subtitle and Link -->
     <p class="font-manrope text-[12px] text-text-muted mt-1">
-      On track menuju target tahunan {{ target }}%
+      Kelengkapan terhadap seluruh evaluasi wajib · target {{ target }}%
     </p>
     <button
-      @click="router.push('/matriks')"
+      @click="router.push({ path: '/wilayah', query: { ...route.query } })"
       class="mt-2 font-manrope text-[12px] font-bold text-brand-navy hover:text-brand-slate inline-flex items-center gap-1 transition-colors"
     >
       Lihat Rincian Unit
-      <span class="material-symbols-outlined text-[14px]">arrow_outward</span>
+      <span aria-hidden="true" class="material-symbols-outlined text-[14px]"
+        >arrow_outward</span
+      >
     </button>
   </div>
 </template>

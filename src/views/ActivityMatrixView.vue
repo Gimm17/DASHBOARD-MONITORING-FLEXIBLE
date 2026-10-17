@@ -1,273 +1,355 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { mockRegions } from '../data/mockData'
-
-const router = useRouter()
-const activeTab = ref<'matriks' | 'grafik' | 'kendala'>('matriks')
-const isFinalized = ref(false)
-
-const finalizePeriod = () => {
-  if (confirm('Konfirmasi: Kunci dan finalkan Periode 3 untuk Sakernas 2026? Snapshot akan disimpan resmi dan terkunci.')) {
-    isFinalized.value = true
-    alert('Periode 3 berhasil dikunci sebagai Revisi 1 Resmi!')
+import { ref, onMounted, computed } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import {
+  api,
+  errorText,
+  number,
+  dateTime,
+  type Detail,
+  type Activity,
+  type Period,
+} from "../services/api";
+const route = useRoute(),
+  router = useRouter();
+const detail = ref<Detail | null>(null),
+  activities = ref<Activity[]>([]),
+  activityId = ref(String(route.query.activity || "")),
+  error = ref(""),
+  busy = ref(false);
+const canCreate = ref(false);
+const history = ref<Record<number, any[]>>({});
+async function loadHistory(p: Period) {
+  try {
+    history.value[p.id] = (
+      await api("periods/" + p.id + "/revisions")
+    ).revisions;
+  } catch (e) {
+    error.value = errorText(e);
   }
 }
+async function load() {
+  error.value = "";
+  busy.value = true;
+  try {
+    const d = await api("dashboard");
+    activities.value = d.activities;
+    canCreate.value = (await api("references")).assignments.some((a: any) =>
+      ["admin", "pjk"].includes(a.role),
+    );
+    if (!activityId.value)
+      activityId.value = String(activities.value[0]?.id || "");
+    if (activityId.value)
+      detail.value = await api("activities/" + activityId.value);
+  } catch (e) {
+    error.value = errorText(e);
+  } finally {
+    busy.value = false;
+  }
+}
+onMounted(load);
+function choose() {
+  router.replace({ path: "/matriks", query: { activity: activityId.value } });
+}
+async function finalize(p: Period) {
+  if (
+    !confirm(
+      "Finalkan " +
+        p.label +
+        "? Nilai dan target disimpan sebagai snapshot resmi.",
+    )
+  )
+    return;
+  busy.value = true;
+  try {
+    await api("periods/" + p.id + "/finalize", {
+      method: "POST",
+      body: { version: p.version },
+    });
+    await load();
+  } catch (e) {
+    error.value = errorText(e);
+  } finally {
+    busy.value = false;
+  }
+}
+async function reopen(p: Period) {
+  const reason = prompt(
+    "Alasan membuka kembali evaluasi final (minimal 5 karakter):",
+  );
+  if (!reason) return;
+  try {
+    await api("periods/" + p.id + "/reopen", {
+      method: "POST",
+      body: { reason },
+    });
+    await load();
+  } catch (e) {
+    error.value = errorText(e);
+  }
+}
+const totals = computed(
+  () =>
+    detail.value?.periods.map((_, i) => {
+      const cells = detail
+        .value!.rows.map((r) => r.cells[i])
+        .filter((c) => c.status !== "TIDAK_DINILAI");
+      const reported = cells.filter((c) => c.value !== null);
+      return {
+        target: cells.reduce((a, c) => a + Number(c.target), 0),
+        value: reported.reduce((a, c) => a + Number(c.value), 0),
+        reported: reported.length,
+        total: cells.length,
+      };
+    }) || [],
+);
+const today = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Asia/Makassar",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+}).format(new Date());
 </script>
-
 <template>
-  <div class="space-y-6">
-    <!-- Header Navigation & Title -->
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-      <div class="flex items-center gap-3">
-        <button
-          @click="router.push('/')"
-          class="w-9 h-9 rounded-xl border border-[#EAEFF5] bg-white text-text-muted hover:text-brand-navy hover:bg-[#F6F8FB] flex items-center justify-center transition-all shadow-xs"
-        >
-          <span class="material-symbols-outlined text-[20px]">arrow_back</span>
-        </button>
+  <div class="space-y-5">
+    <div class="flex flex-wrap justify-between gap-3 items-center">
+      <div>
+        <h1 class="font-outfit text-2xl font-bold text-brand-navy">
+          Matriks Evaluasi Wilayah
+        </h1>
+        <p class="text-sm text-text-muted">
+          Target dan realisasi per jadwal monitoring
+        </p>
+      </div>
+      <router-link v-if="canCreate" to="/kegiatan/baru" class="btn-primary"
+        >+ Kegiatan</router-link
+      >
+    </div>
+    <select
+      v-model="activityId"
+      aria-label="Pilih kegiatan"
+      class="field max-w-xl"
+      @change="choose"
+    >
+      <option value="">Pilih kegiatan</option>
+      <option v-for="a in activities" :key="a.id" :value="String(a.id)">
+        {{ a.title }}
+      </option>
+    </select>
+    <p v-if="error" role="alert" class="notice error">{{ error }}</p>
+    <p v-if="busy" class="notice">Memuat…</p>
+    <template v-if="detail">
+      <div class="flex flex-wrap justify-between gap-3">
         <div>
-          <div class="flex items-center gap-2">
-            <span class="font-mono text-[11px] font-bold text-brand-navy bg-brand-navy-subtle px-2 py-0.5 rounded">
-              #83009
-            </span>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#EAF8EE] text-[#1E824C]">
-              AKTIF
-            </span>
-            <span v-if="isFinalized" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-navy text-white flex items-center gap-1">
-              <span class="material-symbols-outlined text-[12px]">lock</span>
-              FINAL REVISI 1
-            </span>
-          </div>
-          <h1 class="font-outfit text-[22px] font-bold text-text-title tracking-tight leading-snug mt-1">
-            Survei Angkatan Kerja Nasional (Sakernas) 2026
-          </h1>
-          <p class="font-manrope text-[12px] text-text-muted">
-            Tim: <strong>Statistik Sosial</strong> | PJK: <strong>Budi Santoso, S.Si.</strong> | Satuan: <strong>Dokumen Rumah Tangga</strong>
+          <span class="badge"
+            >{{ detail.activity.code }} · {{ detail.activity.status }}</span
+          >
+          <h2 class="font-outfit font-bold text-xl mt-2">
+            {{ detail.activity.title }}
+          </h2>
+          <p class="text-sm text-text-muted">
+            {{ detail.activity.team }} · {{ detail.activity.pjk }} ·
+            {{ detail.activity.indicator }} ({{ detail.activity.unit }})
           </p>
         </div>
-      </div>
-
-      <!-- Action Buttons -->
-      <div class="flex items-center gap-2.5">
-        <button
-          @click="router.push('/realisasi')"
-          class="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-amber text-brand-navy text-[12px] font-manrope font-bold hover:bg-brand-amber-deep transition-all shadow-sm"
+        <router-link
+          v-if="detail.can_manage"
+          :to="'/kegiatan/' + detail.activity.id + '/edit'"
+          class="btn-secondary self-start"
+          >Pengaturan kegiatan</router-link
         >
-          <span class="material-symbols-outlined text-[18px]">edit_note</span>
-          <span>Input Realisasi Batch</span>
-        </button>
-
-        <button
-          @click="finalizePeriod"
-          class="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-brand-navy text-brand-navy text-[12px] font-manrope font-bold hover:bg-brand-navy hover:text-white transition-all shadow-xs"
-        >
-          <span class="material-symbols-outlined text-[18px]">lock</span>
-          <span>Kunci Finalisasi Periode 3</span>
-        </button>
       </div>
-    </div>
-
-    <!-- Navigation Tabs -->
-    <div class="flex items-center gap-2 border-b border-[#EAEFF5] pb-1">
-      <button
-        @click="activeTab = 'matriks'"
-        class="px-4 py-2 rounded-xl text-[13px] font-manrope font-bold transition-all"
-        :class="activeTab === 'matriks' ? 'bg-brand-navy text-white shadow-xs' : 'text-text-muted hover:text-text-title'"
-      >
-        Matriks Realisasi &amp; Target (Wilayah)
-      </button>
-      <button
-        @click="activeTab = 'kendala'"
-        class="px-4 py-2 rounded-xl text-[13px] font-manrope font-bold transition-all"
-        :class="activeTab === 'kendala' ? 'bg-brand-navy text-white shadow-xs' : 'text-text-muted hover:text-text-title'"
-      >
-        Catatan Kendala Lapangan
-      </button>
-      <button
-        @click="router.push('/audit')"
-        class="px-4 py-2 rounded-xl text-[13px] font-manrope font-bold text-text-muted hover:text-text-title"
-      >
-        Log Audit Trail Koreksi (BR-05)
-      </button>
-    </div>
-
-    <!-- Matriks Tab Content -->
-    <div v-if="activeTab === 'matriks'" class="shoppers-card overflow-hidden">
-      <!-- Info Legend Bar -->
-      <div class="p-4 px-6 bg-[#FBFDFE] border-b border-[#EAEFF5] flex flex-wrap items-center justify-between gap-4 text-[12px] font-manrope">
-        <div class="flex items-center gap-4 text-text-muted">
-          <span class="flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-[16px] text-brand-navy">lock</span>
-            Periode Terkunci (Final)
-          </span>
-          <span class="flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-[16px] text-brand-amber-deep">edit</span>
-            Periode Berjalan (Sementara)
-          </span>
-          <span class="flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-[16px] text-red-500">schedule</span>
-            Terlambat (WITA)
-          </span>
-        </div>
-
-        <span class="text-[11px] font-semibold text-brand-slate bg-brand-slate-subtle px-3 py-1 rounded-full">
-          💡 Kolom Wilayah terkunci (Sticky Freeze Column) saat digeser
-        </span>
-      </div>
-
-      <!-- Horizontally Scrolling Table with Sticky Left Column -->
-      <div class="overflow-x-auto relative">
-        <table class="w-full text-left border-collapse min-w-[900px]">
-          <thead>
-            <tr class="bg-[#F6F8FB] border-b border-[#EAEFF5] text-[11px] font-outfit uppercase tracking-wider text-text-muted">
-              <!-- STICKY FROZEN COLUMN -->
-              <th class="py-3.5 px-4 sticky left-0 bg-[#F6F8FB] z-20 shadow-[2px_0_5px_rgba(0,0,0,0.03)] border-r border-[#EAEFF5] w-[220px]">
-                Kabupaten / Kota
-              </th>
-              <th class="py-3.5 px-4 text-center w-[120px]">Target Akhir</th>
-              <th class="py-3.5 px-4 text-center">
-                Periode 1 🔒<br />
-                <span class="text-[10px] text-text-muted font-normal">30 Sep 2026</span>
-              </th>
-              <th class="py-3.5 px-4 text-center">
-                Periode 2 🔒<br />
-                <span class="text-[10px] text-text-muted font-normal">07 Okt 2026</span>
-              </th>
-              <th class="py-3.5 px-4 text-center bg-brand-cream/15">
-                Periode 3 📝 (Aktif)<br />
-                <span class="text-[10px] text-text-muted font-normal">14 Okt 2026</span>
-              </th>
-              <th class="py-3.5 px-4 text-center w-[150px]">Progres Target Akhir</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-[#EAEFF5] text-[13px] font-manrope">
-            <tr v-for="reg in mockRegions" :key="reg.id" class="hover:bg-[#FCFDFE] transition-colors">
-              <!-- STICKY FROZEN REGION CELL -->
-              <td class="py-3.5 px-4 sticky left-0 bg-white z-10 shadow-[2px_0_5px_rgba(0,0,0,0.03)] border-r border-[#EAEFF5] font-outfit font-bold text-text-title">
-                <div class="flex items-center gap-2">
-                  <span class="material-symbols-outlined text-[18px] text-brand-slate">apartment</span>
-                  <span>{{ reg.code }} {{ reg.name }}</span>
-                </div>
-              </td>
-
-              <!-- Target Akhir -->
-              <td class="py-3.5 px-4 text-center font-mono font-bold text-text-title">
-                {{ reg.targetAkhir }}
-              </td>
-
-              <!-- Periode 1 -->
-              <td class="py-3 px-4 text-center">
-                <div class="font-mono font-bold text-[12px] text-text-title">
-                  {{ reg.periode1.realisasi }} / {{ reg.periode1.target }}
-                </div>
-                <span
-                  class="inline-block mt-1 px-2 py-0.5 rounded-full text-[10px] font-bold font-manrope"
-                  :class="reg.periode1.status === 'TERCAPAI' ? 'bg-[#EAF8EE] text-[#1E824C]' : 'bg-[#FFF7EC] text-[#B45309]'"
-                >
-                  {{ reg.periode1.attainment }}%
-                </span>
-              </td>
-
-              <!-- Periode 2 -->
-              <td class="py-3 px-4 text-center">
-                <div class="font-mono font-bold text-[12px] text-text-title">
-                  {{ reg.periode2.realisasi }} / {{ reg.periode2.target }}
-                </div>
-                <span
-                  class="inline-block mt-1 px-2 py-0.5 rounded-full text-[10px] font-bold font-manrope"
-                  :class="reg.periode2.status === 'TERCAPAI' ? 'bg-[#EAF8EE] text-[#1E824C]' : 'bg-[#FFF7EC] text-[#B45309]'"
-                >
-                  {{ reg.periode2.attainment }}%
-                </span>
-              </td>
-
-              <!-- Periode 3 (Aktif) -->
-              <td class="py-3 px-4 text-center bg-brand-cream/10">
-                <template v-if="reg.periode3.realisasi !== null">
-                  <div class="font-mono font-bold text-[12px] text-brand-navy flex items-center justify-center gap-1">
-                    <span>{{ reg.periode3.realisasi }} / {{ reg.periode3.target }}</span>
-                    <span v-if="reg.periode3.isLate" class="material-symbols-outlined text-[14px] text-red-500" title="Terlambat melewati deadline WITA">schedule</span>
-                  </div>
+      <div class="shoppers-card overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="data-table min-w-[800px]">
+            <thead>
+              <tr>
+                <th class="sticky left-0 z-10">Kabupaten / Kota</th>
+                <th>Target akhir</th>
+                <th v-for="p in detail.periods" :key="p.id">
+                  <span>{{ p.label }}</span>
+                  <p class="font-normal mt-1">{{ p.position_date }}</p>
+                  <span class="badge">{{
+                    p.state === "final"
+                      ? "Final revisi " + p.revision
+                      : p.revision
+                        ? "Koreksi terbuka · resmi r" + p.revision
+                        : "Sementara"
+                  }}</span>
+                </th>
+                <th>Progres akhir</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="row in detail.rows" :key="row.id">
+                <td class="sticky left-0 bg-white font-bold z-10">
+                  {{ row.code }} {{ row.name }}
+                  <p v-if="row.left_on" class="text-xs font-normal">
+                    Keluar {{ row.left_on }}
+                  </p>
+                </td>
+                <td>{{ number(row.final_target) }}</td>
+                <td v-for="cell in row.cells" :key="cell.period_id">
+                  <p class="font-mono font-bold">
+                    {{ number(cell.value) }} / {{ number(cell.target) }}
+                  </p>
                   <span
-                    class="inline-block mt-1 px-2 py-0.5 rounded-full text-[10px] font-bold font-manrope"
-                    :class="reg.periode3.status === 'TERCAPAI' ? 'bg-[#EAF8EE] text-[#1E824C]' : 'bg-[#FFF7EC] text-[#B45309]'"
+                    class="badge mt-1"
+                    :class="{
+                      good: cell.status === 'TERCAPAI',
+                      warning: ['BELUM_ADA_DATA', 'DI_BAWAH_TARGET'].includes(
+                        cell.status,
+                      ),
+                    }"
+                    >{{ cell.status.replaceAll("_", " ") }}</span
                   >
-                    {{ reg.periode3.attainment }}% {{ reg.periode3.status === 'TERCAPAI' ? '✓' : '⚠️' }}
-                  </span>
-                </template>
-                <template v-else>
-                  <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#FEEEEE] text-[#C53030]">
-                    ○ Belum Ada Data
-                  </span>
-                </template>
-              </td>
-
-              <!-- Progres Target Akhir -->
-              <td class="py-3.5 px-4">
-                <div class="flex items-center gap-2">
-                  <div class="flex-1 h-2 bg-[#F0F4F8] rounded-full overflow-hidden">
+                  <p v-if="cell.attainment !== null" class="text-xs mt-1">
+                    {{ number(cell.attainment) }}% target periode
+                  </p>
+                  <p v-if="cell.isLate" class="text-xs text-red-700">
+                    Laporan terlambat
+                  </p>
+                  <p
+                    v-if="cell.notes"
+                    class="text-xs text-text-muted mt-1 max-w-[240px]"
+                  >
+                    {{ cell.notes }}
+                  </p>
+                </td>
+                <td>
+                  <strong
+                    >{{ number(row.progress)
+                    }}{{ row.progress === null ? "" : "%" }}</strong
+                  >
+                  <div class="h-1.5 w-24 rounded bg-slate-100 mt-2">
                     <div
-                      class="h-full rounded-full transition-all duration-300"
-                      :class="reg.progresAkhir >= 100 ? 'bg-[#1E824C]' : 'bg-brand-navy'"
-                      :style="{ width: `${Math.min(reg.progresAkhir, 100)}%` }"
+                      class="h-1.5 rounded bg-brand-navy"
+                      :style="{ width: Math.min(row.progress || 0, 100) + '%' }"
                     ></div>
                   </div>
-                  <span class="font-mono text-[11px] font-bold text-text-title">{{ reg.progresAkhir }}%</span>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-
-          <!-- Aggregat Footer (BR-06 Weighted Formula) -->
-          <tfoot class="bg-[#F6F8FB] border-t-2 border-[#D5E1F0] font-outfit text-[12px] font-bold">
-            <tr>
-              <td class="py-3.5 px-4 sticky left-0 bg-[#F6F8FB] border-r border-[#EAEFF5] text-brand-navy">
-                AGREGAT PROVINSI (BR-06)
-              </td>
-              <td class="py-3.5 px-4 text-center font-mono">1,070 Dok</td>
-              <td class="py-3.5 px-4 text-center text-[#1E824C] font-mono">293 / 300 (97.7%)</td>
-              <td class="py-3.5 px-4 text-center text-[#1E824C] font-mono">745 / 750 (99.3%)</td>
-              <td class="py-3.5 px-4 text-center text-brand-navy font-mono bg-brand-cream/20">902 / 955 (94.5%)</td>
-              <td class="py-3.5 px-4 text-center text-brand-navy font-mono">84.3% Akhir</td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-    </div>
-
-    <!-- Kendala Lapangan Tab -->
-    <div v-else class="shoppers-card p-6 space-y-4">
-      <h3 class="font-outfit text-[16px] font-bold text-text-title">
-        Daftar Catatan Kendala Lapangan Sakernas 2026
-      </h3>
-      <div class="divide-y divide-[#EAEFF5]">
-        <div class="py-3.5 flex items-start gap-4">
-          <span class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-brand-navy-subtle text-brand-navy shrink-0 font-mono">
-            7402 KAB. MUNA
-          </span>
-          <div class="flex-1">
-            <span class="text-[13px] font-bold text-text-title block">Koreksi Kuesioner Duplikat</span>
-            <p class="text-[12px] text-text-muted mt-0.5">
-              Ditemukan 5 dokumen rumah tangga berulang pada blok sensus perbatasan. Sedang menunggu pengesahan berita acara koreksi.
-            </p>
-          </div>
-          <span class="text-[11px] text-text-muted">14 Okt 2026, 09:30 WITA</span>
-        </div>
-
-        <div class="py-3.5 flex items-start gap-4">
-          <span class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-brand-navy-subtle text-brand-navy shrink-0 font-mono">
-            7406 KAB. BOMBANA
-          </span>
-          <div class="flex-1">
-            <span class="text-[13px] font-bold text-text-title block">Cuaca Ekstrem Jalur Laut</span>
-            <p class="text-[12px] text-text-muted mt-0.5">
-              Pengiriman berkas dari Pulau Kabaena tertunda gelombang tinggi. Data diperkirakan tiba 16 Oktober.
-            </p>
-          </div>
-          <span class="text-[11px] text-text-muted">13 Okt 2026, 16:45 WITA</span>
+                </td>
+              </tr>
+              <tr v-if="!detail.rows.length">
+                <td
+                  :colspan="detail.periods.length + 3"
+                  class="!py-10 text-center text-text-muted"
+                >
+                  Belum ada peserta.
+                </td>
+              </tr>
+            </tbody>
+            <tfoot v-if="detail.activity.value_type === 'count'">
+              <tr class="bg-brand-cream/20 font-bold">
+                <td class="p-4">Agregat peserta terlihat</td>
+                <td></td>
+                <td v-for="(t, i) in totals" :key="i" class="p-4">
+                  {{ number(t.value) }} / {{ number(t.target) }}
+                  <p class="text-xs font-normal">
+                    {{ t.reported }}/{{ t.total }} laporan ·
+                    {{
+                      t.total && t.target
+                        ? number((t.value / t.target) * 100) + "%"
+                        : "—"
+                    }}
+                  </p>
+                </td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
         </div>
       </div>
-    </div>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div v-for="p in detail.periods" :key="p.id" class="shoppers-card p-5">
+          <h3 class="font-bold text-brand-navy">{{ p.label }}</h3>
+          <p class="text-xs text-text-muted mt-1">
+            Posisi {{ p.position_date }} · Batas {{ dateTime(p.due_at) }}
+          </p>
+          <div class="flex flex-wrap gap-2 mt-4">
+            <router-link
+              v-if="
+                detail.can_write &&
+                p.state !== 'final' &&
+                p.position_date <= today &&
+                (detail.activity.status === 'AKTIF' || p.current_revision_id)
+              "
+              :to="{
+                path: '/realisasi',
+                query: { activity: detail.activity.id, period: p.id },
+              }"
+              class="btn-primary"
+              >Input realisasi</router-link
+            ><button
+              v-if="detail.can_manage && p.state !== 'final'"
+              :disabled="
+                busy ||
+                p.position_date > today ||
+                (detail.activity.status !== 'AKTIF' && !p.current_revision_id)
+              "
+              class="btn-secondary"
+              @click="finalize(p)"
+            >
+              Finalisasi</button
+            ><button
+              v-if="detail.can_reopen && p.state === 'final'"
+              :disabled="busy"
+              class="btn-secondary"
+              @click="reopen(p)"
+            >
+              Buka koreksi
+            </button>
+          </div>
+          <details
+            v-if="p.revision"
+            class="mt-4 text-xs"
+            @toggle="
+              ($event.target as HTMLDetailsElement).open && loadHistory(p)
+            "
+          >
+            <summary class="cursor-pointer font-semibold">
+              Riwayat revisi resmi
+            </summary>
+            <div
+              v-for="revision in history[p.id]"
+              :key="revision.id"
+              class="border-t mt-3 pt-3"
+            >
+              <strong>Revisi {{ revision.revision }}</strong> ·
+              {{ dateTime(revision.created_at) }} · {{ revision.actor }}
+              <p class="text-text-muted">
+                Versi target {{ revision.snapshot.target_version }} · aturan
+                {{ revision.snapshot.rule_version }}
+              </p>
+              <table class="data-table mt-2">
+                <thead>
+                  <tr>
+                    <th>Wilayah</th>
+                    <th>Realisasi / target</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(cell, id) in revision.snapshot.cells" :key="id">
+                    <td>
+                      {{
+                        detail.rows.find((r) => String(r.id) === String(id))
+                          ?.name || id
+                      }}
+                    </td>
+                    <td>
+                      {{ number(cell.value) }} / {{ number(cell.target) }}
+                    </td>
+                    <td>{{ cell.status.replaceAll("_", " ") }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
+        </div>
+      </div>
+    </template>
+    <p v-else-if="!busy && !error" class="notice">
+      Belum ada kegiatan yang dapat dilihat.
+    </p>
   </div>
 </template>
