@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BPS DMF - Pratinjau Dokumen Berita Acara Koreksi Data</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;family=Outfit:wght@500;600;700;800&amp;family=Cinzel:wght@700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "outline-variant": "#c5c6cf",
+            "on-primary-fixed": "#071a3e",
+            "text-title": "#0F1A30",
+            "on-surface": "#191c1e",
+            "surface-tint": "#4e5e85",
+            "tertiary-fixed-dim": "#f5bc68",
+            "surface-container-lowest": "#ffffff",
+            "status-dibawah-border": "#FFC570",
+            "on-secondary": "#ffffff",
+            "status-kosong-border": "#FCA5A5",
+            "text-body": "#3E4B5E",
+            "inverse-on-surface": "#eff1f4",
+            "brand-slate-subtle": "#F0F4F8",
+            "inverse-surface": "#2d3133",
+            "brand-navy": "#1A3263",
+            "status-kosong-bg": "#FEEEEE",
+            "status-terjadwal-bg": "#EDF3F9",
+            "status-tercapai-border": "#B7E4C7",
+            "on-background": "#191c1e",
+            "inverse-primary": "#b6c6f3",
+            "tertiary-container": "#342000",
+            "surface-container": "#eceef1",
+            "surface-variant": "#e0e3e6",
+            "brand-slate-light": "#7A9AB5",
+            "brand-cream-soft": "#FAF4ED",
+            "secondary-container": "#badefd",
+            "primary-fixed": "#d9e2ff",
+            "on-secondary-fixed-variant": "#264a63",
+            "on-primary-container": "#7b8bb5",
+            "on-error": "#ffffff",
+            "tertiary-fixed": "#ffddb2",
+            "status-terjadwal-border": "#BEE3F8",
+            "on-tertiary-fixed": "#291800",
+            "status-dibawah-text": "#B45309",
+            "status-tercapai-text": "#1E824C",
+            "tertiary": "#180c00",
+            "border-card": "#EAEFF5",
+            "on-secondary-fixed": "#001e2f",
+            "primary-container": "#122347",
+            "on-tertiary-container": "#b38234",
+            "brand-navy-subtle": "#EDF2FA",
+            "outline": "#75777f",
+            "surface-container-low": "#f2f4f7",
+            "surface": "#f7f9fc",
+            "primary": "#000d2c",
+            "secondary-fixed-dim": "#a7cbe9",
+            "secondary-fixed": "#cae6ff",
+            "on-tertiary": "#ffffff",
+            "primary-fixed-dim": "#b6c6f3",
+            "status-kosong-text": "#C53030",
+            "status-terjadwal-text": "#2B6CB0",
+            "on-secondary-container": "#40637d",
+            "status-tercapai-bg": "#EAF8EE",
+            "surface-dim": "#d8dadd",
+            "status-dibawah-bg": "#FFF7EC",
+            "text-muted": "#7E8D9F",
+            "surface-bright": "#f7f9fc",
+            "error-container": "#ffdad6",
+            "surface-container-high": "#e6e8eb",
+            "on-tertiary-fixed-variant": "#624000",
+            "on-primary-fixed-variant": "#36466c",
+            "on-surface-variant": "#45464e",
+            "surface-container-highest": "#e0e3e6",
+            "secondary": "#3f627c",
+            "brand-cream": "#EFD2B0",
+            "brand-amber-deep": "#E6A74B",
+            "on-primary": "#ffffff",
+            "error": "#ba1a1a",
+            "on-error-container": "#93000a",
+            "background": "#f7f9fc"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "fontFamily": {
+            "headline-md": ["Outfit", "sans-serif"],
+            "headline-sm": ["Outfit", "sans-serif"],
+            "headline-lg": ["Outfit", "sans-serif"],
+            "headline-xl": ["Outfit", "sans-serif"],
+            "label-md": ["Manrope", "sans-serif"],
+            "label-sm": ["Manrope", "sans-serif"],
+            "body-md": ["Manrope", "sans-serif"],
+            "body-sm": ["Manrope", "sans-serif"],
+            "body-lg": ["Manrope", "sans-serif"],
+            "stat-metric": ["Outfit", "sans-serif"]
+          },
+          "fontSize": {
+            "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "headline-sm": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+            "label-md": ["13px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "headline-lg": ["26px", { "lineHeight": "34px", "letterSpacing": "-0.015em", "fontWeight": "700" }],
+            "body-sm": ["12px", { "lineHeight": "18px", "fontWeight": "400" }],
+            "label-sm": ["11px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "headline-xl": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "body-md": ["14px", { "lineHeight": "22px", "fontWeight": "400" }],
+            "body-lg": ["16px", { "lineHeight": "26px", "fontWeight": "400" }],
+            "stat-metric": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: #F0F4F8;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #C5C6CF;
+      border-radius: 9999px;
+    }
+    .paper-shadow {
+      box-shadow: 0 16px 40px -8px rgba(26, 50, 99, 0.14), 0 0 1px 1px rgba(26, 50, 99, 0.06);
+    }
+    .ambient-glow {
+      box-shadow: 0 4px 18px rgba(255, 197, 112, 0.45);
+    }
+  </style>
+</head>
+<body class="bg-surface text-text-body font-body-md antialiased overflow-hidden h-screen flex flex-col select-none">
+<!-- TOP DOCUMENT CONTROLS TOOLBAR -->
+<header class="h-[72px] bg-surface-container-lowest border-b border-border-card shrink-0 px-6 flex items-center justify-between z-30 shadow-sm">
+<!-- Left info and title -->
+<div class="flex items-center gap-4">
+<a class="flex items-center justify-center w-10 h-10 rounded-xl bg-brand-slate-subtle hover:bg-surface-container-low text-brand-navy transition-all duration-150 active:scale-95" href="#">
+<span class="material-symbols-outlined text-[20px]">arrow_back</span>
+</a>
+<div class="h-7 w-[1px] bg-border-card"></div>
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-lg bg-brand-navy-subtle flex items-center justify-center text-brand-navy">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">picture_as_pdf</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<h1 class="font-headline-sm text-headline-sm text-text-title tracking-tight">Pratinjau Dokumen Berita Acara</h1>
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-status-tercapai-bg text-status-tercapai-text border border-status-tercapai-border">
+<span class="material-symbols-outlined text-[13px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+              Sah &amp; Terverifikasi (Digital Signature Valid)
+            </span>
+</div>
+<p class="font-body-sm text-body-sm text-text-muted font-mono tracking-tight text-[11px]">SK-AUD/BPS-7400/2026/10-042.pdf • 248.6 KB • Terkunci di Server Provinsi</p>
+</div>
+</div>
+</div>
+<!-- Center Document Viewing Tools -->
+<div class="hidden lg:flex items-center bg-brand-slate-subtle rounded-xl p-1 border border-border-card/60">
+<button class="w-8 h-8 flex items-center justify-center rounded-lg text-text-muted hover:text-brand-navy hover:bg-surface-container-lowest transition-colors active:scale-95" title="Zoom Out">
+<span class="material-symbols-outlined text-[18px]">zoom_out</span>
+</button>
+<div class="px-2 text-label-sm font-label-sm text-text-title font-medium">100%</div>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg text-text-muted hover:text-brand-navy hover:bg-surface-container-lowest transition-colors active:scale-95" title="Zoom In">
+<span class="material-symbols-outlined text-[18px]">zoom_in</span>
+</button>
+<div class="h-4 w-[1px] bg-outline-variant/30 mx-1"></div>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg text-text-muted hover:text-brand-navy hover:bg-surface-container-lowest transition-colors active:scale-95" title="Fit to Width">
+<span class="material-symbols-outlined text-[18px]">fit_screen</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg text-text-muted hover:text-brand-navy hover:bg-surface-container-lowest transition-colors active:scale-95" title="Rotate">
+<span class="material-symbols-outlined text-[18px]">rotate_right</span>
+</button>
+<div class="h-4 w-[1px] bg-outline-variant/30 mx-1"></div>
+<div class="flex items-center gap-1.5 px-2 text-label-sm font-label-sm text-text-muted">
+<span>Hal</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container-lowest font-semibold text-text-title border border-border-card shadow-2xs">1</span>
+<span>dari 2</span>
+</div>
+</div>
+<!-- Right Action Buttons -->
+<div class="flex items-center gap-2.5">
+<button class="hidden sm:inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-border-card bg-surface-container-lowest text-text-title font-label-md text-label-md hover:bg-surface-container-low transition-all active:scale-95 shadow-xs">
+<span class="material-symbols-outlined text-[18px] text-text-muted">print</span>
+        Cetak
+      </button>
+<button class="hidden md:inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-border-card bg-surface-container-lowest text-text-title font-label-md text-label-md hover:bg-surface-container-low transition-all active:scale-95 shadow-xs">
+<span class="material-symbols-outlined text-[18px] text-text-muted">mail</span>
+        Kirim e-Office
+      </button>
+<button class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-navy text-surface-container-lowest font-label-md text-label-md hover:bg-primary-container transition-all active:scale-95 shadow-[0_4px_14px_rgba(26,50,99,0.25)]">
+<span class="material-symbols-outlined text-[18px]">download</span>
+        Unduh PDF Asli
+      </button>
+<div class="h-6 w-[1px] bg-border-card mx-1"></div>
+<a class="w-9 h-9 rounded-xl flex items-center justify-center text-text-muted hover:text-brand-navy hover:bg-surface-container-low transition-all" href="#" title="Tutup Pratinjau">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</a>
+</div>
+</header>
+<!-- MAIN WORKSPACE: DOCUMENT CANVAS + RIGHT INSPECTION PANEL -->
+<div class="flex-1 flex overflow-hidden">
+<!-- LEFT DOCUMENT CANVAS (SCROLLABLE A4 SHEET) -->
+<div class="flex-1 bg-surface-dim/40 overflow-y-auto custom-scroll p-6 lg:p-10 flex flex-col items-center">
+<!-- A4 PAPER CONTAINER (Official Government Document) -->
+<div class="w-full max-w-[820px] bg-surface-container-lowest rounded-sm paper-shadow border border-border-card p-12 lg:p-14 relative text-text-title my-2">
+<!-- WATERMARK BACKGROUND (SUBTLE) -->
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.025] select-none">
+<span class="material-symbols-outlined text-[380px] text-brand-navy">verified_user</span>
+</div>
+<!-- RESMI KOP SURAT BPS -->
+<div class="flex items-start gap-5 pb-4 border-b-2 border-brand-navy relative">
+<!-- BPS Logo Graphic Mark -->
+<div class="w-16 h-16 shrink-0 flex items-center justify-center">
+<div class="w-14 h-14 rounded-full bg-brand-navy flex items-center justify-center text-white relative shadow-inner">
+<span class="material-symbols-outlined text-[32px] text-brand-cream">equalizer</span>
+<div class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-status-dibawah-border flex items-center justify-center text-[10px] text-brand-navy font-bold">
+                ★
+              </div>
+</div>
+</div>
+<div class="flex-1 text-center pr-10">
+<h2 class="font-headline-md text-headline-md tracking-wider text-brand-navy font-extrabold uppercase">Badan Pusat Statistik</h2>
+<h3 class="font-headline-sm text-headline-sm text-brand-navy font-bold tracking-tight uppercase">Provinsi Sulawesi Tenggara</h3>
+<p class="font-body-sm text-body-sm text-text-body mt-0.5">Jalan Prof. Dr. Abd. Rauf Tarimana, Kompleks Bumi Triputra Kendari 93118</p>
+<p class="font-body-sm text-body-sm text-text-muted text-[11px]">Telepon: (0401) 3121183 • Faksimile: (0401) 3121184 • Laman: sultra.bps.go.id</p>
+</div>
+</div>
+<!-- Decorative Double Line -->
+<div class="h-[1px] bg-brand-navy w-full mt-0.5 mb-7"></div>
+<!-- DOCUMENT TITLE & METADATA -->
+<div class="text-center mb-8">
+<h4 class="font-headline-sm text-headline-sm text-brand-navy uppercase font-bold tracking-wide">
+            Berita Acara Validasi dan Pengesahan Koreksi Nilai Realisasi Kumulatif
+          </h4>
+<p class="font-label-md text-label-md font-mono text-text-muted mt-1 font-semibold">
+            Nomor: B-402/7400/VS.300/10/2026
+          </p>
+<div class="inline-block mt-2 px-3 py-1 rounded bg-brand-slate-subtle border border-border-card text-[11px] font-label-sm text-text-body">
+            Dasar Ketentuan: Peraturan Kepala BPS No. 4 Tahun 2025 tentang Integritas Tata Kelola Data Statistik (BR-05)
+          </div>
+</div>
+<!-- OPENING STATEMENT -->
+<div class="text-justify font-body-md text-body-md text-text-body leading-relaxed mb-6">
+<p>
+            Pada hari ini, <strong class="text-text-title font-semibold">Sabtu</strong> tanggal <strong class="text-text-title font-semibold">Tujuh Belas</strong> bulan <strong class="text-text-title font-semibold">Oktober</strong> tahun <strong class="text-text-title font-semibold">Dua Ribu Dua Puluh Enam (17-10-2026)</strong>, bertempat di Kantor Badan Pusat Statistik Provinsi Sulawesi Tenggara, yang bertandatangan di bawah ini:
+          </p>
+</div>
+<!-- PARTIES INVOLVED LIST -->
+<div class="space-y-4 mb-7 bg-brand-slate-subtle/50 p-5 rounded-xl border border-border-card/80">
+<!-- Pihak 1: Pemohon -->
+<div class="flex items-start gap-3">
+<span class="w-6 h-6 rounded-full bg-brand-navy text-white text-[12px] font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
+<div class="grid grid-cols-1 sm:grid-cols-4 gap-1 w-full text-body-sm font-body-sm">
+<span class="text-text-muted sm:col-span-1">Nama / NIP</span>
+<span class="sm:col-span-3 text-text-title font-semibold">: Wa Ode Sitti, S.Tr.Stat. <span class="font-normal text-text-muted font-mono">(19930814 201602 2 001)</span></span>
+<span class="text-text-muted sm:col-span-1">Jabatan / Satker</span>
+<span class="sm:col-span-3 text-text-title font-medium">: PJK Sakernas BPS Kabupaten Muna (Satker 7402)</span>
+<span class="text-text-muted sm:col-span-1">Peran Audit</span>
+<span class="sm:col-span-3 text-brand-navy font-semibold">: PIHAK I (Pemohon Koreksi Data Lapangan)</span>
+</div>
+</div>
+<div class="h-[1px] bg-border-card"></div>
+<!-- Pihak 2: Pengesah -->
+<div class="flex items-start gap-3">
+<span class="w-6 h-6 rounded-full bg-brand-navy text-white text-[12px] font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
+<div class="grid grid-cols-1 sm:grid-cols-4 gap-1 w-full text-body-sm font-body-sm">
+<span class="text-text-muted sm:col-span-1">Nama / NIP</span>
+<span class="sm:col-span-3 text-text-title font-semibold">: Drs. Ahmad Fauzi, M.Si. <span class="font-normal text-text-muted font-mono">(19740512 199803 1 002)</span></span>
+<span class="text-text-muted sm:col-span-1">Jabatan / Satker</span>
+<span class="sm:col-span-3 text-text-title font-medium">: Katim Nerwilis &amp; Evaluasi BPS Provinsi Sulawesi Tenggara (Satker 7400)</span>
+<span class="text-text-muted sm:col-span-1">Peran Audit</span>
+<span class="sm:col-span-3 text-brand-navy font-semibold">: PIHAK II (Pemeriksa &amp; Pejabat Pengesah Agregat)</span>
+</div>
+</div>
+</div>
+<p class="font-body-md text-body-md text-text-body text-justify leading-relaxed mb-4">
+          Menyatakan dengan sesungguhnya bahwa telah dilakukan telaah teknis dan rekonsiliasi data anomali pada sistem Dashboard Monitoring Flexible (DMF). Berdasarkan hasil audit lapangan, disepakati perubahan nilai realisasi sebagai berikut:
+        </p>
+<!-- AUDIT SUMMARY TABLE -->
+<div class="border border-border-card rounded-xl overflow-hidden mb-7 bg-surface-container-lowest">
+<div class="bg-brand-navy-subtle px-4 py-2.5 border-b border-border-card flex items-center justify-between">
+<span class="font-label-md text-label-md font-bold text-brand-navy uppercase tracking-wider text-[11px]">Rincian Penyesuaian Nilai Realisasi Sasaran</span>
+<span class="font-mono text-label-sm font-label-sm text-text-muted">Kode Objek: SAKERNAS-26-T3-7402</span>
+</div>
+<table class="w-full text-left text-body-sm font-body-sm">
+<tbody class="divide-y divide-border-card">
+<tr>
+<td class="px-4 py-3 bg-brand-slate-subtle/40 font-medium text-text-muted w-1/3">Nama Kegiatan Statistik</td>
+<td class="px-4 py-3 font-semibold text-text-title">Survei Angkatan Kerja Nasional (Sakernas) 2026 - Periode 3</td>
+</tr>
+<tr>
+<td class="px-4 py-3 bg-brand-slate-subtle/40 font-medium text-text-muted">Satuan Kerja / Wilayah</td>
+<td class="px-4 py-3 text-text-title"><span class="font-mono font-semibold text-brand-navy">7402</span> - BPS Kabupaten Muna (Kecamatan Katobu &amp; Batalaiworu)</td>
+</tr>
+<tr>
+<td class="px-4 py-3 bg-brand-slate-subtle/40 font-medium text-text-muted">Beban Target Definitif</td>
+<td class="px-4 py-3 font-semibold text-text-title">110 Dokumen Kuesioner (Rumah Tangga Terpilih)</td>
+</tr>
+<tr>
+<td class="px-4 py-3 bg-brand-slate-subtle/40 font-medium text-text-muted">Nilai Tercatat Sebelum Koreksi</td>
+<td class="px-4 py-3 text-status-dibawah-text font-bold">
+                  70 Dokumen <span class="text-text-muted font-normal text-[11px]">(Progres Lapangan 63.63% - Status Terkunci)</span>
+</td>
+</tr>
+<tr>
+<td class="px-4 py-3 bg-brand-slate-subtle/40 font-medium text-text-muted">Nilai Koreksi Akhir yang Disahkan</td>
+<td class="px-4 py-3 text-status-tercapai-text font-bold flex items-center gap-2">
+<span class="text-[15px]">65 Dokumen</span>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] bg-status-dibawah-bg text-status-dibawah-text border border-status-dibawah-border font-semibold">
+                    Koreksi Penurunan: -5 Dokumen
+                  </span>
+</td>
+</tr>
+<tr>
+<td class="px-4 py-3 bg-brand-slate-subtle/40 font-medium text-text-muted">Kategori Discrepancy / Anomali</td>
+<td class="px-4 py-3 text-text-title">
+<span class="inline-block px-2 py-0.5 rounded bg-brand-cream-soft text-text-title font-medium text-[11px] border border-brand-cream mr-1">
+                    Duplikasi ID Ruta (BS 008B)
+                  </span>
+                  Entri ganda kuesioner mitra pencacah cadangan
+                </td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- JUSTIFIKASI TEKNIS -->
+<div class="mb-8">
+<h5 class="font-label-md text-label-md font-bold text-brand-navy uppercase mb-1.5">Pertimbangan &amp; Justifikasi Teknis:</h5>
+<div class="p-3.5 rounded-lg bg-surface-container-lowest border border-border-card text-body-sm font-body-sm text-text-body space-y-1.5 leading-relaxed">
+<p>
+              1. Berdasarkan verifikasi pengawasan kualitas (PML) tertanggal 16 Oktober 2026, ditemukan 5 sampel responden duplikat yang secara keliru diunggah ulang pada modul FASIH CAPI Mobile oleh petugas pengganti.
+            </p>
+<p>
+              2. Sesuai rekomendasi Tim Pengolahan Nerwilis BPS Provinsi Sulawesi Tenggara, 5 kuesioner duplikat telah dibatalkan (void) dari basis data utama agar tidak menyebabkan bias estimasi rata-rata jam kerja regional.
+            </p>
+<p>
+              3. Angka kumulatif mutlak sebesar <strong>65 dokumen (59.09%)</strong> dinyatakan sebagai nilai final yang sah untuk perhitungan rasio beban kerja termin berjalan.
+            </p>
+</div>
+</div>
+<!-- DIGITAL SIGNATURE SECTION (BSrE & QR CODE STAMP) -->
+<div class="grid grid-cols-2 gap-8 pt-4 pb-6">
+<!-- Pemohon Signature Box -->
+<div class="text-center flex flex-col items-center">
+<p class="font-label-md text-label-md text-text-muted">PIHAK I (Pemohon)</p>
+<p class="font-body-sm text-body-sm text-text-title font-semibold mb-2">PJK Sakernas BPS Kab. Muna</p>
+<!-- Digital Stamp Frame -->
+<div class="w-48 p-3 rounded-xl border border-dashed border-brand-slate-light/60 bg-brand-slate-subtle/30 flex flex-col items-center relative my-1">
+<!-- Small BSrE certified badge -->
+<div class="w-16 h-16 rounded-lg bg-surface-container-lowest border border-border-card p-1 shadow-xs flex items-center justify-center">
+<div class="w-full h-full bg-brand-navy-subtle rounded flex flex-col items-center justify-center text-brand-navy">
+<span class="material-symbols-outlined text-[24px]">qr_code_2</span>
+<span class="text-[7px] font-mono font-bold tracking-tight">BSrE VERIFIED</span>
+</div>
+</div>
+<div class="mt-2 text-center">
+<span class="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-status-tercapai-text">
+<span class="material-symbols-outlined text-[10px]">lock</span>
+                  DIGITALLY SIGNED
+                </span>
+<p class="text-[9px] text-text-muted font-mono leading-tight">17-10-2026 19:14 WITA</p>
+</div>
+</div>
+<p class="font-label-md text-label-md text-text-title font-bold mt-2">Wa Ode Sitti, S.Tr.Stat.</p>
+<p class="font-mono text-[11px] text-text-muted">NIP. 19930814 201602 2 001</p>
+</div>
+<!-- Pengesah Signature Box -->
+<div class="text-center flex flex-col items-center">
+<p class="font-label-md text-label-md text-text-muted">PIHAK II (Mengesahkan)</p>
+<p class="font-body-sm text-body-sm text-text-title font-semibold mb-2">Katim Nerwilis &amp; Evaluasi Prov. Sultra</p>
+<!-- Digital Stamp Frame -->
+<div class="w-48 p-3 rounded-xl border border-brand-navy/30 bg-brand-navy-subtle/40 flex flex-col items-center relative my-1">
+<!-- Official QR Stamp -->
+<div class="w-16 h-16 rounded-lg bg-surface-container-lowest border border-brand-navy/20 p-1 shadow-sm flex items-center justify-center relative">
+<div class="w-full h-full bg-brand-navy text-surface-container-lowest rounded flex flex-col items-center justify-center">
+<span class="material-symbols-outlined text-[24px] text-brand-cream">qr_code_scanner</span>
+<span class="text-[7px] font-mono font-bold text-brand-cream">BPS RI E-SIGN</span>
+</div>
+<div class="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-status-tercapai-text text-white flex items-center justify-center">
+<span class="material-symbols-outlined text-[10px]">check</span>
+</div>
+</div>
+<div class="mt-2 text-center">
+<span class="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-brand-navy">
+<span class="material-symbols-outlined text-[10px]">verified</span>
+                  TERVERIFIKASI OTENTIK
+                </span>
+<p class="text-[9px] text-text-muted font-mono leading-tight">17-10-2026 21:35 WITA</p>
+</div>
+</div>
+<p class="font-label-md text-label-md text-text-title font-bold mt-2">Drs. Ahmad Fauzi, M.Si.</p>
+<p class="font-mono text-[11px] text-text-muted">NIP. 19740512 199803 1 002</p>
+</div>
+</div>
+<!-- OFFICIAL SECURITY INTEGRITY FOOTER -->
+<div class="border-t border-border-card pt-4 mt-4 flex items-center justify-between text-[10px] text-text-muted font-mono">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px] text-brand-slate-light">fingerprint</span>
+<span>SHA-256: 7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069</span>
+</div>
+<div class="flex items-center gap-2">
+<span>Sistem Otomasi Dokumen BPS DMF • Dokumen Rahasia Negara</span>
+<span>[ Hal 1 / 2 ]</span>
+</div>
+</div>
+</div>
+<!-- PAGE INDICATOR PILL FLOATING -->
+<div class="mt-4 mb-2 flex items-center gap-3 bg-surface-container-lowest/90 backdrop-blur-md px-4 py-2 rounded-full border border-border-card shadow-sm text-label-sm font-label-sm text-text-muted">
+<span>Menampilkan Lembar 1 dari 2</span>
+<span class="h-3 w-[1px] bg-border-card"></span>
+<button class="text-brand-navy font-semibold hover:underline flex items-center gap-1">
+          Lihat Lampiran Matriks BS (Hal 2)
+          <span class="material-symbols-outlined text-[14px]">arrow_downward</span>
+</button>
+</div>
+</div>
+<!-- RIGHT INSPECTION PANEL (AUDIT DETAILS & METADATA) -->
+<aside class="w-[380px] bg-surface-container-lowest border-l border-border-card flex flex-col shrink-0 overflow-y-auto custom-scroll shadow-lg z-20">
+<!-- Panel Header -->
+<div class="p-6 border-b border-border-card flex items-center justify-between">
+<div>
+<span class="text-label-sm font-label-sm text-brand-slate-light font-bold uppercase tracking-wider">Audit Metadata</span>
+<h2 class="font-headline-sm text-headline-sm text-text-title">Informasi Validasi</h2>
+</div>
+<div class="w-8 h-8 rounded-lg bg-status-tercapai-bg text-status-tercapai-text flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">verified_user</span>
+</div>
+</div>
+<div class="p-6 space-y-6 flex-1">
+<!-- Audit Ticket Card -->
+<div class="p-4 rounded-xl bg-brand-slate-subtle/70 border border-border-card">
+<div class="flex items-center justify-between mb-2">
+<span class="text-label-sm font-label-sm text-text-muted">Nomor Tiket Audit</span>
+<span class="font-mono text-label-md font-label-md font-bold text-brand-navy">#AUD-7402-2026-03</span>
+</div>
+<div class="space-y-1.5 text-body-sm font-body-sm">
+<div class="flex justify-between">
+<span class="text-text-muted">Waktu Otorisasi:</span>
+<span class="font-semibold text-text-title">17 Okt 2026, 21:35 WITA</span>
+</div>
+<div class="flex justify-between">
+<span class="text-text-muted">Kanal Pengajuan:</span>
+<span class="text-text-title">DMF Web Form Koreksi</span>
+</div>
+<div class="flex justify-between">
+<span class="text-text-muted">Sertifikasi:</span>
+<span class="text-status-tercapai-text font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">lock</span> BSrE RI Tier-3
+              </span>
+</div>
+</div>
+</div>
+<!-- Status Sinkronisasi Real-time -->
+<div class="space-y-3">
+<span class="text-label-md font-label-md font-bold text-text-title">Status Integrasi Sistem</span>
+<div class="flex items-start gap-3 p-3 rounded-xl bg-surface border border-border-card">
+<div class="w-6 h-6 rounded-full bg-status-tercapai-bg text-status-tercapai-text flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[14px]">check</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-text-title font-semibold">FASIH Web &amp; CAPI Mobile</p>
+<p class="font-body-sm text-body-sm text-text-muted text-[11px]">5 Kuesioner duplikat telah berstatus Non-Aktif (Locked)</p>
+</div>
+</div>
+<div class="flex items-start gap-3 p-3 rounded-xl bg-surface border border-border-card">
+<div class="w-6 h-6 rounded-full bg-status-tercapai-bg text-status-tercapai-text flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[14px]">check</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-text-title font-semibold">Agregasi Provinsi Sultra</p>
+<p class="font-body-sm text-body-sm text-text-muted text-[11px]">Nilai agregat Muna disesuaikan menjadi 65 dari 110 target</p>
+</div>
+</div>
+<div class="flex items-start gap-3 p-3 rounded-xl bg-surface border border-border-card">
+<div class="w-6 h-6 rounded-full bg-status-tercapai-bg text-status-tercapai-text flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[14px]">check</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-text-title font-semibold">BPS RI Central Data Warehouse</p>
+<p class="font-body-sm text-body-sm text-text-muted text-[11px]">Sinkronisasi tercatat pada checksum database nasional</p>
+</div>
+</div>
+</div>
+<!-- SHA-256 Copy Container -->
+<div class="space-y-2">
+<div class="flex items-center justify-between">
+<span class="text-label-sm font-label-sm font-bold text-text-title uppercase tracking-wider">Digital Hash (SHA-256)</span>
+<button class="text-label-sm font-label-sm text-brand-navy hover:underline flex items-center gap-1 font-semibold">
+<span class="material-symbols-outlined text-[14px]">content_copy</span> Salin
+            </button>
+</div>
+<div class="p-3 bg-brand-slate-subtle rounded-xl border border-border-card font-mono text-[11px] text-text-muted break-all leading-tight select-all">
+            7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069
+          </div>
+</div>
+<!-- AI Assistant / Integrity Assessment Pill -->
+<div class="p-4 rounded-xl bg-brand-cream-soft border border-brand-cream relative overflow-hidden">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-7 h-7 rounded-full bg-brand-navy text-brand-cream flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px]">smart_toy</span>
+</div>
+<span class="font-label-md text-label-md font-bold text-brand-navy">AI Integrity Auditor</span>
+</div>
+<p class="font-body-sm text-body-sm text-text-body text-[12px] leading-relaxed">
+            Tidak ditemukan potensi fraud terstruktur. Selisih 5 dokumen terbukti murni human error akibat pergantian perangkat CAPI mitra pencacah. Dokumen koreksi memenuhi standar ISO 27001 BPS.
+          </p>
+</div>
+</div>
+<!-- Drawer Bottom Actions -->
+<div class="p-6 border-t border-border-card bg-surface space-y-2.5">
+<button class="w-full py-2.5 px-4 rounded-xl bg-brand-navy text-surface-container-lowest font-label-md text-label-md font-semibold hover:bg-primary-container transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-[18px]">history</span>
+          Buka di Log Audit Trail
+        </button>
+<a class="w-full py-2.5 px-4 rounded-xl border border-border-card bg-surface-container-lowest text-text-title font-label-md text-label-md font-semibold hover:bg-surface-container-low transition-all active:scale-[0.98] flex items-center justify-center gap-2 text-center" href="#">
+          Kembali ke Dashboard Utama
+        </a>
+</div>
+</aside>
+</div>
+</body></html>

@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BPS DMF - Klarifikasi &amp; Permintaan Revisi #AUD-7401-2026-04</title>
+<!-- Google Fonts: Outfit & Manrope -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;family=Outfit:wght@500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS via CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Verbatim Tailwind Config -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "text-muted": "#7E8D9F",
+            "on-error": "#ffffff",
+            "surface": "#f7f9fc",
+            "surface-tint": "#4e5e85",
+            "on-surface-variant": "#45464e",
+            "status-terjadwal-border": "#BEE3F8",
+            "on-tertiary-container": "#b38234",
+            "primary": "#000d2c",
+            "on-primary": "#ffffff",
+            "on-primary-container": "#7b8bb5",
+            "text-title": "#0F1A30",
+            "on-tertiary-fixed": "#291800",
+            "surface-container-highest": "#e0e3e6",
+            "brand-slate-subtle": "#F0F4F8",
+            "primary-fixed-dim": "#b6c6f3",
+            "tertiary": "#180c00",
+            "text-body": "#3E4B5E",
+            "inverse-surface": "#2d3133",
+            "on-secondary-fixed": "#001e2f",
+            "outline-variant": "#c5c6cf",
+            "status-kosong-bg": "#FEEEEE",
+            "status-dibawah-border": "#FFC570",
+            "on-error-container": "#93000a",
+            "surface-container": "#eceef1",
+            "secondary-fixed": "#cae6ff",
+            "status-terjadwal-text": "#2B6CB0",
+            "on-primary-fixed-variant": "#36466c",
+            "on-surface": "#191c1e",
+            "brand-cream": "#EFD2B0",
+            "surface-container-lowest": "#ffffff",
+            "status-dibawah-text": "#B45309",
+            "background": "#f7f9fc",
+            "on-tertiary-fixed-variant": "#624000",
+            "status-tercapai-border": "#B7E4C7",
+            "primary-container": "#122347",
+            "surface-bright": "#f7f9fc",
+            "on-secondary-fixed-variant": "#264a63",
+            "error-container": "#ffdad6",
+            "brand-navy-subtle": "#EDF2FA",
+            "inverse-on-surface": "#eff1f4",
+            "brand-amber-deep": "#E6A74B",
+            "surface-container-high": "#e6e8eb",
+            "brand-navy": "#1A3263",
+            "border-card": "#EAEFF5",
+            "inverse-primary": "#b6c6f3",
+            "secondary-container": "#badefd",
+            "surface-container-low": "#f2f4f7",
+            "brand-slate-light": "#7A9AB5",
+            "surface-dim": "#d8dadd",
+            "status-tercapai-bg": "#EAF8EE",
+            "status-tercapai-text": "#1E824C",
+            "tertiary-fixed-dim": "#f5bc68",
+            "tertiary-container": "#342000",
+            "brand-cream-soft": "#FAF4ED",
+            "status-kosong-border": "#FCA5A5",
+            "on-secondary": "#ffffff",
+            "on-background": "#191c1e",
+            "surface-variant": "#e0e3e6",
+            "secondary-fixed-dim": "#a7cbe9",
+            "on-primary-fixed": "#071a3e",
+            "status-kosong-text": "#C53030",
+            "status-dibawah-bg": "#FFF7EC",
+            "on-secondary-container": "#40637d",
+            "outline": "#75777f",
+            "status-terjadwal-bg": "#EDF3F9",
+            "secondary": "#3f627c",
+            "primary-fixed": "#d9e2ff",
+            "tertiary-fixed": "#ffddb2",
+            "error": "#ba1a1a",
+            "on-tertiary": "#ffffff"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-md": "1rem",
+            "space-lg": "1.5rem",
+            "space-xl": "2.25rem",
+            "space-sm": "0.5rem",
+            "space-xs": "0.25rem",
+            "gutter-mobile": "0.75rem",
+            "gutter": "1.5rem",
+            "margin": "2rem",
+            "margin-mobile": "1rem"
+          },
+          "fontFamily": {
+            "label-md": ["Manrope"],
+            "headline-sm": ["Outfit"],
+            "headline-md": ["Outfit"],
+            "body-lg": ["Manrope"],
+            "label-sm": ["Manrope"],
+            "body-md": ["Manrope"],
+            "body-sm": ["Manrope"],
+            "headline-lg": ["Outfit"],
+            "stat-metric": ["Outfit"],
+            "headline-xl-mobile": ["Outfit"],
+            "headline-xl": ["Outfit"]
+          },
+          "fontSize": {
+            "label-md": ["13px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "headline-sm": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+            "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "body-lg": ["16px", { "lineHeight": "26px", "fontWeight": "400" }],
+            "label-sm": ["11px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "body-md": ["14px", { "lineHeight": "22px", "fontWeight": "400" }],
+            "body-sm": ["12px", { "lineHeight": "18px", "fontWeight": "400" }],
+            "headline-lg": ["26px", { "lineHeight": "34px", "letterSpacing": "-0.015em", "fontWeight": "700" }],
+            "stat-metric": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "headline-xl-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "headline-xl": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    body {
+      background-color: #f7f9fc;
+      font-family: 'Manrope', sans-serif;
+      color: #3E4B5E;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 5px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f2f4f7;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #c5c6cf;
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #7A9AB5;
+    }
+  </style>
+</head>
+<body class="relative min-h-screen overflow-x-hidden selection:bg-brand-navy selection:text-white">
+<!-- ========================================================================= -->
+<!-- BACKGROUND REVIEW CANVASES (SIMULATING UNDERLYING AUDIT DRAWER COCKPIT) -->
+<!-- ========================================================================= -->
+<div class="fixed inset-0 flex pointer-events-none select-none opacity-40 blur-[1px]">
+<!-- Simulated Left Navigation Shell Rail -->
+<div class="w-[260px] bg-surface-container-lowest border-r border-border-card h-full flex flex-col justify-between py-6 px-4">
+<div class="space-y-6">
+<div class="flex items-center gap-3 px-2">
+<div class="w-9 h-9 rounded-xl bg-brand-navy text-surface-container-lowest flex items-center justify-center font-headline-md font-bold">B</div>
+<div>
+<div class="font-headline-sm text-brand-navy font-bold leading-tight">BPS DMF</div>
+<div class="text-[10px] text-text-muted">Monitoring Flexible</div>
+</div>
+</div>
+<div class="space-y-1">
+<div class="flex items-center gap-3 px-3 py-2 text-text-muted"><span class="material-symbols-outlined text-lg">dashboard</span><span class="text-sm">Dashboard</span></div>
+<div class="flex items-center gap-3 px-3 py-2 text-text-muted"><span class="material-symbols-outlined text-lg">assignment</span><span class="text-sm">Kegiatan</span></div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-xl bg-brand-navy-subtle text-brand-navy font-semibold"><span class="material-symbols-outlined text-lg">fact_check</span><span class="text-sm">Evaluasi</span></div>
+<div class="flex items-center gap-3 px-3 py-2 text-text-muted"><span class="material-symbols-outlined text-lg">map</span><span class="text-sm">Wilayah</span></div>
+</div>
+</div>
+</div>
+<!-- Underlying Content Simulation (Audit Ticket Detail) -->
+<div class="flex-1 bg-surface p-8 space-y-6">
+<div class="h-14 bg-surface-container-lowest rounded-xl border border-border-card flex items-center px-6 justify-between">
+<span class="font-headline-sm text-text-title">Review Audit BR-05 • Kab. Buton (7401)</span>
+<span class="text-xs bg-status-dibawah-bg text-status-dibawah-text px-3 py-1 rounded-full font-semibold">Butuh Klarifikasi Satker</span>
+</div>
+<div class="grid grid-cols-3 gap-6">
+<div class="col-span-2 h-72 bg-surface-container-lowest rounded-2xl border border-border-card p-6"></div>
+<div class="h-72 bg-surface-container-lowest rounded-2xl border border-border-card p-6"></div>
+</div>
+</div>
+</div>
+<!-- ========================================================================= -->
+<!-- MODAL BACKDROP OVERLAY (Executive Tinted Dark Navy Blur) -->
+<!-- ========================================================================= -->
+<div class="fixed inset-0 z-50 bg-[#0F1A30]/55 backdrop-blur-[6px] flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+<!-- ========================================================================= -->
+<!-- MODAL CONTAINER (Max-w-[680px], Luxe Elevation, Clean 18px Radius) -->
+<!-- ========================================================================= -->
+<div aria-labelledby="modal-headline" aria-modal="true" class="relative w-full max-w-[680px] bg-surface-container-lowest rounded-[18px] border border-border-card shadow-[0_24px_50px_-12px_rgba(26,50,99,0.32),0_4px_18px_rgba(26,50,99,0.06)] flex flex-col overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-200" role="dialog">
+<!-- 1. HEADER MODAL -->
+<div class="px-7 pt-6 pb-5 border-b border-border-card bg-surface-container-lowest flex items-start justify-between relative">
+<div class="flex items-start gap-4">
+<!-- Icon Header with Gold Accent Glow Micro-Pill -->
+<div class="relative shrink-0">
+<div class="w-12 h-12 rounded-2xl bg-brand-navy-subtle flex items-center justify-center text-brand-navy shadow-inner">
+<span class="material-symbols-outlined text-[24px]">mark_chat_unread</span>
+</div>
+<!-- Warm Gold Aksen Badge -->
+<span class="absolute -top-1 -right-1 w-4 h-4 bg-status-dibawah-border rounded-full border-2 border-surface-container-lowest flex items-center justify-center shadow-[0_2px_8px_rgba(255,197,112,0.6)]">
+<span class="w-1.5 h-1.5 bg-text-title rounded-full"></span>
+</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<h2 class="font-headline-md text-headline-md text-text-title" id="modal-headline">
+                Kirim Pesan Klarifikasi &amp; Instruksi Revisi
+              </h2>
+</div>
+<p class="font-body-sm text-body-sm text-text-muted mt-0.5 flex items-center gap-2">
+<span class="font-semibold text-brand-navy">Tiket Audit BR-05 #AUD-7401-2026-04</span>
+<span>•</span>
+<span class="inline-flex items-center gap-1 text-text-body">
+<span class="material-symbols-outlined text-[14px] text-text-muted">location_on</span>
+                BPS Kab. Buton (7401)
+              </span>
+</p>
+</div>
+</div>
+<!-- Tombol Close [✕] -->
+<button aria-label="Tutup Dialog" class="shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-text-muted hover:text-text-title hover:bg-surface-container-low transition-colors duration-150 active:scale-95 cursor-pointer ml-3 -mt-1" onclick="window.history.back()" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<!-- SCROLLABLE BODY CONTENT -->
+<div class="px-7 py-5 overflow-y-auto max-h-[calc(88vh-140px)] custom-scrollbar space-y-5">
+<!-- 2. RINGKASAN PENERIMA & KONTEKS MASALAH AUDIT -->
+<div class="rounded-xl bg-brand-slate-subtle border border-border-card p-4 space-y-3">
+<!-- Row Atas: Penerima & Multichannel Sync Pills -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 border-b border-border-card">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded-full bg-brand-navy text-surface-container-lowest flex items-center justify-center font-headline-sm text-xs font-bold shrink-0">
+                FR
+              </div>
+<div>
+<div class="font-label-sm text-label-sm text-text-muted">Target Penerima Klarifikasi:</div>
+<div class="font-label-md text-label-md text-text-title">
+                  Fajar Ramadhan <span class="font-normal text-text-muted">(Staf Nerwilis)</span> &amp; Kepala BPS Kab. Buton
+                </div>
+</div>
+</div>
+<!-- Integrated Broadcast Channels Badges -->
+<div class="flex flex-wrap items-center gap-1.5 self-start sm:self-auto">
+<span class="inline-flex items-center gap-1 text-[10px] font-semibold tracking-tight text-status-tercapai-text bg-status-tercapai-bg border border-status-tercapai-border px-2 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-[12px]">check_circle</span>
+                Portal DMF
+              </span>
+<span class="inline-flex items-center gap-1 text-[10px] font-semibold tracking-tight text-brand-navy bg-brand-navy-subtle border border-border-card px-2 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-[12px]">mail</span>
+                Email BPS
+              </span>
+<span class="inline-flex items-center gap-1 text-[10px] font-semibold tracking-tight text-status-tercapai-text bg-status-tercapai-bg border border-status-tercapai-border px-2 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-[12px]">chat</span>
+                WhatsApp
+              </span>
+</div>
+</div>
+<!-- Row Bawah: Konteks Singkat Masalah -->
+<div class="flex items-start gap-2.5 pt-0.5">
+<span class="material-symbols-outlined text-status-dibawah-text text-[18px] shrink-0 mt-0.5">error_outline</span>
+<p class="font-body-sm text-body-sm text-text-body leading-relaxed">
+<strong class="font-semibold text-text-title">Ketidaksesuaian Berkas:</strong> Penurunan dari 10 Rekap ke 8 Rekap (PDRB Triwulan III Nerwilis) — Berkas BA belum berstempel sah &amp; belum ditandatangani Kepala BPS Kab. Buton.
+            </p>
+</div>
+</div>
+<!-- 3. TEMPLATE PESAN CEPAT (QUICK PRESET CHIPS) -->
+<div>
+<div class="flex items-center justify-between mb-2">
+<label class="font-label-md text-label-md text-text-title flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-brand-navy">auto_awesome</span>
+              Template Respon Cepat
+            </label>
+<span class="font-label-sm text-label-sm text-text-muted">Pilih untuk memuat draf standar</span>
+</div>
+<div class="flex flex-wrap gap-2">
+<!-- Preset 1 (Active Pill) -->
+<button class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-label-sm font-label-sm bg-brand-navy text-surface-container-lowest font-medium shadow-sm transition-all duration-150 cursor-pointer" type="button">
+<span class="material-symbols-outlined text-[14px]">check</span>
+              Permintaan Tanda Tangan &amp; Stempel BA
+            </button>
+<!-- Preset 2 -->
+<button class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-label-sm font-label-sm bg-surface-container-lowest border border-border-card text-text-body hover:bg-brand-navy-subtle hover:text-brand-navy transition-all duration-150 cursor-pointer" type="button">
+<span class="material-symbols-outlined text-[14px] text-text-muted">attach_file</span>
+              Lampiran Bukti Responden
+            </button>
+<!-- Preset 3 -->
+<button class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-label-sm font-label-sm bg-surface-container-lowest border border-border-card text-text-body hover:bg-brand-navy-subtle hover:text-brand-navy transition-all duration-150 cursor-pointer" type="button">
+<span class="material-symbols-outlined text-[14px] text-text-muted">schedule</span>
+              Batas Waktu Cut-Off
+            </button>
+<!-- Preset 4 -->
+<button class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-label-sm font-label-sm bg-surface-container-lowest border border-border-card text-text-muted hover:bg-surface-container-low hover:text-text-title transition-all duration-150 cursor-pointer" type="button">
+<span class="material-symbols-outlined text-[14px]">edit_note</span>
+              Teks Kustom
+            </button>
+</div>
+</div>
+<!-- 4. FORM AREA PESAN KLARIFIKASI -->
+<div class="space-y-4">
+<!-- Subjek Field -->
+<div>
+<label class="block font-label-md text-label-md text-text-title mb-1.5" for="clarification-subject">
+              Subjek Klarifikasi Dinas
+            </label>
+<div class="relative">
+<input class="w-full px-3.5 py-2.5 bg-surface-container-lowest border border-border-card rounded-xl font-body-sm text-body-sm text-text-title font-medium focus:outline-none focus:ring-2 focus:ring-brand-navy/20 focus:border-brand-navy transition-all duration-150" id="clarification-subject" type="text" value="[URGENT REVISI BR-05] Kelengkapan Berita Acara &amp; Konfirmasi Pembukuan Pabrik Aspal Pasarwajo (#AUD-7401-2026-04)"/>
+<span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-status-dibawah-text bg-status-dibawah-bg px-2 py-0.5 rounded text-[10px] font-bold">
+                PRIORITAS TINGGI
+              </span>
+</div>
+</div>
+<!-- Textarea Isi Pesan -->
+<div>
+<div class="flex items-center justify-between mb-1.5">
+<label class="font-label-md text-label-md text-text-title flex items-center gap-1.5" for="official-message">
+                Isi Pesan Resmi 
+                <span class="text-xs font-normal text-text-muted">(Pengirim: Drs. Ahmad Fauzi - Katim Nerwilis Provinsi)</span>
+</label>
+<span class="text-[11px] font-medium text-brand-navy bg-brand-navy-subtle px-2 py-0.5 rounded">
+                Format Surat Kedinasan
+              </span>
+</div>
+<div class="relative rounded-xl border border-border-card focus-within:border-brand-navy focus-within:ring-2 focus-within:ring-brand-navy/15 transition-all">
+<textarea class="w-full p-3.5 bg-surface-container-lowest rounded-xl font-body-sm text-body-sm text-text-title leading-relaxed resize-none border-none focus:outline-none focus:ring-0" id="official-message" rows="7">Yth. Tim Nerwilis BPS Kab. Buton (Sdr. Fajar Ramadhan &amp; Pimpinan BPS Kab. Buton),
+
+Berdasarkan penelaahan kami pada pengajuan tiket koreksi #AUD-7401-2026-04, permohonan penurunan angka realisasi dari 10 menjadi 8 rekap belum dapat disahkan oleh Provinsi karena:
+1. Berkas PDF Berita Acara (BA) belum ditandatangani oleh Kepala BPS Kab. Buton dan belum disertai stempel basah / segel digital BSrE yang valid.
+2. Mohon melampirkan surat pernyataan atau bukti korespondensi resmi dari pihak manajemen perusahaan aspal terkait penghentian operasi sementara.
+
+Harap unggah berkas pembaharuan sebelum batas cut-off evaluasi: 13 Oktober 2026 pukul 16:00 WITA. Terima kasih.</textarea>
+<!-- Footer Tooling Textarea -->
+<div class="px-3.5 py-2 bg-surface-container-low/70 border-t border-border-card rounded-b-xl flex items-center justify-between text-text-muted">
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center gap-1 text-[11px] font-medium text-status-tercapai-text">
+<span class="material-symbols-outlined text-[13px]">spellcheck</span>
+                    Bahasa Baku Kedinasan Terverifikasi
+                  </span>
+</div>
+<div class="text-[11px] font-medium tracking-tight">
+<span class="text-brand-navy font-semibold">512</span> / 1000 Karakter
+                </div>
+</div>
+</div>
+</div>
+</div>
+<!-- 5. OPSI TAMBAHAN & PENGATURAN NOTIFIKASI -->
+<div class="pt-1 border-t border-border-card space-y-3">
+<!-- Toggle 1: Salinan WA Prioritas -->
+<label class="flex items-center justify-between p-2.5 rounded-xl hover:bg-surface-container-low transition-colors cursor-pointer border border-transparent hover:border-border-card">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-brand-navy text-[20px] mt-0.5">phone_iphone</span>
+<div>
+<div class="font-label-md text-label-md text-text-title">
+                  Kirimkan salinan SMS/WA Notifikasi Prioritas
+                </div>
+<div class="font-body-sm text-body-sm text-text-muted">
+                  Diteruskan langsung ke nomor dinas Katim Buton (+62 812-4211-xxxx)
+                </div>
+</div>
+</div>
+<!-- Custom Styled Switch Checkbox (Checked) -->
+<div class="relative inline-flex items-center shrink-0 ml-3">
+<input checked="" class="sr-only peer" id="toggle-whatsapp" type="checkbox"/>
+<div class="w-10 h-5 bg-border-card peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-navy"></div>
+</div>
+</label>
+<!-- Toggle 2: Status Tiket & Reset SLA -->
+<label class="flex items-center justify-between p-2.5 rounded-xl hover:bg-surface-container-low transition-colors cursor-pointer border border-transparent hover:border-border-card">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-status-dibawah-text text-[20px] mt-0.5">timer</span>
+<div>
+<div class="font-label-md text-label-md text-text-title">
+                  Tandai tiket sebagai "Menunggu Respon Satker" &amp; reset SLA timer
+                </div>
+<div class="font-body-sm text-body-sm text-text-muted">
+                  Beban durasi verifikasi dialihkan ke satker hingga berkas diunggah ulang
+                </div>
+</div>
+</div>
+<div class="relative inline-flex items-center shrink-0 ml-3">
+<input checked="" class="sr-only peer" id="toggle-sla" type="checkbox"/>
+<div class="w-10 h-5 bg-border-card peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-navy"></div>
+</div>
+</label>
+<!-- Tenggat Waktu Respon Badge -->
+<div class="flex items-center justify-between px-3 py-2.5 rounded-xl bg-status-dibawah-bg/60 border border-status-dibawah-border/50 text-status-dibawah-text">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">event_busy</span>
+<span class="font-label-md text-label-md">Tenggat Waktu Klarifikasi:</span>
+</div>
+<div class="font-label-md text-label-md font-bold flex items-center gap-1.5">
+<span>13 Okt 2026, 16:00 WITA</span>
+<span class="text-[10px] bg-status-dibawah-border/40 text-text-title px-2 py-0.5 rounded-full font-bold">2 hari tersisa</span>
+</div>
+</div>
+</div>
+</div>
+<!-- 6. MODAL FOOTER (AKSI BAWAH DENGAN ELEVASI SHOPEERS LUXE) -->
+<div class="px-7 py-4 border-t border-border-card bg-surface-container-lowest flex flex-col-reverse sm:flex-row items-center justify-between gap-3">
+<!-- Sisi Kiri: Batal -->
+<button class="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-border-card text-text-body font-label-md text-label-md hover:bg-surface-container-low hover:text-text-title transition-colors duration-150 active:scale-[0.98] cursor-pointer" onclick="window.history.back()" type="button">
+          Batal / Tutup
+        </button>
+<!-- Sisi Kanan: Simpan Draf & Tombol Utama Kirim -->
+<div class="w-full sm:w-auto flex items-center gap-3">
+<button class="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-border-card bg-surface-container-lowest text-text-title font-label-md text-label-md hover:bg-brand-navy-subtle hover:text-brand-navy transition-colors duration-150 active:scale-[0.98] cursor-pointer inline-flex items-center justify-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[16px] text-text-muted">save</span>
+            Simpan Draf
+          </button>
+<button class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-brand-navy text-surface-container-lowest font-headline-sm text-headline-sm font-semibold shadow-[0_4px_14px_rgba(26,50,99,0.25)] hover:bg-primary-container transition-all duration-150 active:scale-[0.98] cursor-pointer inline-flex items-center justify-center gap-2 group" onclick="alert('Pesan klarifikasi dan instruksi revisi berhasil dikirim ke BPS Kab. Buton!');" type="button">
+<span>Kirim Pesan &amp; Instruksi Revisi</span>
+<span class="material-symbols-outlined text-[18px] group-hover:translate-x-0.5 transition-transform duration-150">send</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</body></html>
