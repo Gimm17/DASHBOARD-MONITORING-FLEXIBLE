@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-const version=process.argv[2]||'1.0.0-rc.1';
+const version=process.argv[2]||'1.0.0-rc.2';
 if(!/^[0-9A-Za-z.-]+$/.test(version))throw new Error('Invalid release version');
 const root=path.resolve(import.meta.dirname,'../release');
 const dir=path.join(root,version);

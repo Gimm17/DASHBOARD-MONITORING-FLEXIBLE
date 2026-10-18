@@ -3,7 +3,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { execSync, execFileSync } from "node:child_process";
 const root = path.resolve(import.meta.dirname, "..");
-const version = process.argv[2] || "1.0.0-rc.1";
+const version = process.argv[2] || "1.0.0-rc.2";
 if (!/^[0-9A-Za-z.-]+$/.test(version)) throw new Error("Invalid version");
 const releases = path.join(root, "release"),
   target = path.join(releases, version);

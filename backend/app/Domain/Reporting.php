@@ -70,8 +70,13 @@ class Reporting
             return ['region_id' => $row['region_id'], 'status' => 'saved', 'version' => $old->version, 'value' => $oldValue];
         }
         $reason = trim($row['reason'] ?? '');
-        $previous = DB::table('realizations')->join('periods', 'periods.id', '=', 'realizations.period_id')->where('periods.activity_id', $activity->id)->where('periods.position_date', '<', $period->position_date)->where('region_id', $row['region_id'])->whereNotNull('value')->orderByDesc('periods.position_date')->value('value');
-        $decrease = ($value === null && $oldValue !== null) || ($value !== null && (($previous !== null && bccomp($value, (string) $previous, 4) < 0) || ($oldValue !== null && bccomp($value, $oldValue, 4) < 0)));
+        $previous = $this->neighborValues($period, $row['region_id'], true);
+        $next = $this->neighborValues($period, $row['region_id'], false);
+        $decrease = ($value === null && $oldValue !== null) || ($value !== null && (
+            ($oldValue !== null && bccomp($value, $oldValue, 4) < 0)
+            || collect($previous)->contains(fn ($neighbor) => bccomp($value, (string) $neighbor, 4) < 0)
+            || collect($next)->contains(fn ($neighbor) => bccomp($value, (string) $neighbor, 4) > 0)
+        ));
         if (($old || $decrease) && strlen($reason) < 5) {
             throw ValidationException::withMessages(['reason' => 'Perubahan/koreksi membutuhkan alasan minimal 5 karakter.']);
         }
@@ -90,6 +95,23 @@ class Reporting
         Audit::record($user, 'realization.saved', $activity->id, $period->id, $row['region_id'], ['value' => $oldValue], ['value' => $value, 'notes' => $notes], $reason ?: null);
 
         return ['region_id' => $row['region_id'], 'status' => 'saved', 'version' => $fields['version'], 'value' => $value];
+    }
+
+    private function neighborValues(object $period, int $regionId, bool $previous): array
+    {
+        // Activity locking serializes all writes across periods. Keep both working and
+        // official values in view while a neighboring final evaluation is under correction.
+        $neighbor = DB::table('periods as p')
+            ->leftJoin('realizations as r', fn ($join) => $join->on('r.period_id', '=', 'p.id')->where('r.region_id', $regionId))
+            ->leftJoin('evaluation_items as e', fn ($join) => $join->on('e.revision_id', '=', 'p.current_revision_id')->where('e.region_id', $regionId))
+            ->where('p.activity_id', $period->activity_id)
+            ->where('p.position_date', $previous ? '<' : '>', $period->position_date)
+            ->where(fn ($query) => $query->whereNotNull('r.value')->orWhereNotNull('e.value'))
+            ->where(fn ($query) => $query->whereNull('e.status')->orWhere('e.status', '!=', 'TIDAK_DINILAI'))
+            ->orderBy('p.position_date', $previous ? 'desc' : 'asc')
+            ->first(['r.value as working_value', 'e.value as official_value']);
+
+        return $neighbor ? array_values(array_filter((array) $neighbor, fn ($value) => $value !== null)) : [];
     }
 
     public function finalize(User $user, int $periodId, int $expectedVersion): array

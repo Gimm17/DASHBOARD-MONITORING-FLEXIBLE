@@ -64,3 +64,11 @@ Started: 17 October 2026 Asia/Makassar
 The result is a tested local release candidate, not a statement that cPanel deployment or organization acceptance has happened. Gamification remains disabled pending policy. No production secrets, database dump, local accounts or test data are included in the release artifact. Branch remains feat/backend-production; no remote publication or deployment is performed without the actual DMF target.
 
 Automated database tests additionally refuse to run RefreshDatabase against any database except in-memory SQLite or a MySQL database explicitly named _test_. Source checks must invoke the backend test command from backend (or through composer --working-dir=backend test).
+
+## Review follow-up — 18 October 2026
+
+- Historical cumulative inserts/increases now inspect the nearest preceding and following reports, including the official value of an evaluation whose correction is open. A newly introduced descending sequence requires a reason and PJK approval; pending requests leave stored values untouched. Existing reviewed exceptions remain possible and audited.
+- Saving an active configuration cannot remove every period or every participant. The check executes under the activity lock before any mutation, preserving the previous version, target set, periods and participant membership on failure. Incomplete drafts remain allowed.
+- Changing a draft's start date synchronizes existing initial participants' joined_on while no reports exist. Active participation and finalized history are not rewritten.
+- Six regression tests added. SQLite and PDO MySQL/MariaDB suites both pass: 45 tests, 284 assertions. The historical same-day participant exit test retains a second active participant to respect the new completeness rule.
+- Focused independent review found no actionable regressions in these fixes. Release candidate rc.2 supersedes rc.1 for deployment.

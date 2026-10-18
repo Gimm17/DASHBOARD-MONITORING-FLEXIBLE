@@ -4,7 +4,7 @@
 
 Aplikasi terdiri dari Vue SPA pada `server/public/spa` dan Laravel pada `server`. Document root harus menunjuk **server/public**, bukan akar repositori atau server. Browser dan /api memakai satu origin HTTPS. Node hanya diperlukan pada mesin build. PHP minimal 8.4.1 dengan BCMath, PDO MySQL, mbstring, openssl, tokenizer, xml, ctype, fileinfo dan ekstensi standar Laravel. Gunakan PHP-FPM dengan OPcache pada produksi.
 
-Rilis dibangun dari akar proyek dengan `npm run release -- 1.0.0-rc.1`. Skrip menolak menimpa versi yang sudah ada, memasang vendor tanpa dependensi pengembangan, dan menghasilkan ZIP, manifest SHA256 per file, serta hash arsip. Tidak ada .env, database lokal, data demo, akun contoh, log, test, atau node_modules di dalam paket. Berkas production.env.example adalah contoh konfigurasi; sesuaikan domain dan kredensial melalui saluran pengelola, bukan Git.
+Rilis dibangun dari akar proyek dengan `npm run release -- 1.0.0-rc.2`. Skrip menolak menimpa versi yang sudah ada, memasang vendor tanpa dependensi pengembangan, dan menghasilkan ZIP, manifest SHA256 per file, serta hash arsip. Tidak ada .env, database lokal, data demo, akun contoh, log, test, atau node_modules di dalam paket. Berkas production.env.example adalah contoh konfigurasi; sesuaikan domain dan kredensial melalui saluran pengelola, bukan Git.
 
 ## Instalasi pertama
 

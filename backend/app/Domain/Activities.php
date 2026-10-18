@@ -91,6 +91,18 @@ class Activities
             if ($old && $old->version !== (int) $data['version']) {
                 abort(409, 'Konfigurasi telah diubah. Muat ulang.');
             }
+            if ($old?->status === 'AKTIF') {
+                $errors = [];
+                if (empty($data['periods'])) {
+                    $errors['periods'] = 'Kegiatan aktif harus memiliki minimal satu periode evaluasi.';
+                }
+                if (empty($data['region_targets'])) {
+                    $errors['region_targets'] = 'Kegiatan aktif harus memiliki minimal satu peserta.';
+                }
+                if ($errors) {
+                    throw ValidationException::withMessages($errors);
+                }
+            }
             if ($old && in_array($old->status, ['SELESAI', 'ARSIP', 'BATAL'], true)) {
                 $correctionOpen = DB::table('periods')->where('activity_id', $id)->whereNotNull('current_revision_id')->where('state', 'open')->exists();
                 abort_unless($this->access->admin($user) && $correctionOpen, 423, 'Kegiatan ditutup. Admin dapat membuka evaluasi final untuk koreksi.');
@@ -142,6 +154,8 @@ class Activities
                 }
                 if (! $member) {
                     DB::table('activity_regions')->insert(['activity_id' => $id, 'region_id' => $r['region_id'], 'joined_on' => $old && $old->status === 'AKTIF' ? now('Asia/Makassar')->toDateString() : $data['start_date']]);
+                } elseif ($old?->status === 'DRAF' && ! $hasReports) {
+                    DB::table('activity_regions')->where('id', $member->id)->update(['joined_on' => $data['start_date']]);
                 }
                 $targets[$r['region_id']] = ['final' => $r['final_target'], 'periods' => array_combine($periodIds, $r['targets']) ?: []];
             }

@@ -5,14 +5,14 @@ Paket ini memakai satu domain atau subdomain khusus, misalnya monitoring.domain-
 ## Persiapan hosting
 
 1. Pilih PHP 8.4 pada MultiPHP Manager atau Select PHP Version. Pastikan CLI Terminal memakai versi yang sama; periksa `php -v` dan `php -m`. Laravel memerlukan minimal PHP 8.4.1 dan aplikasi memerlukan BCMath serta PDO MySQL. Bila CLI default berbeda, gunakan lokasi executable yang dikonfirmasi penyedia hosting untuk seluruh perintah Artisan dan Composer.
-2. Buat subdomain dengan document root menuju direktori **server/public** pada rilis, misalnya `/home/akun/dmf/releases/1.0.0-rc.1/server/public`. Gunakan direktori baru yang tidak berisi aplikasi lain. Pastikan batas document root di akun mengizinkan lokasi ini. Jika pembatasan hosting menghalangi, minta penyedia mengatur document root; jangan mengekspos seluruh folder server.
+2. Buat subdomain dengan document root menuju direktori **server/public** pada rilis, misalnya `/home/akun/dmf/releases/1.0.0-rc.2/server/public`. Gunakan direktori baru yang tidak berisi aplikasi lain. Pastikan batas document root di akun mengizinkan lokasi ini. Jika pembatasan hosting menghalangi, minta penyedia mengatur document root; jangan mengekspos seluruh folder server.
 3. Aktifkan sertifikat melalui SSL/TLS Status atau fasilitas penyedia, lalu Force HTTPS Redirect. Konfirmasikan domain sebenarnya sebelum membuat APP_URL.
 4. Buat database dan pengguna melalui MySQL Database Wizard. Nama pada cPanel biasanya memakai awalan akun. Berikan pengguna izin pada database aplikasi tersebut; masukkan nama lengkap berawalan ke konfigurasi.
 5. Pastikan tersedia Terminal atau SSH untuk menjalankan migrasi dan provisioning. Tanpa akses tersebut, minta pengelola hosting menjalankannya. Paket sudah membawa vendor dan aset; Node serta Composer tidak diperlukan di hosting bila paket kompatibel dengan platform PHP server.
 
 ## Upload dan konfigurasi
 
-1. Upload `dmf-1.0.0-rc.1.zip` ke direktori rilis baru dengan File Manager, lalu Extract. ZIP berisi folder server, operations, manifest, dan contoh environment. Pastikan File Manager menampilkan hidden files sehingga public/.htaccess terlihat.
+1. Upload `dmf-1.0.0-rc.2.zip` ke direktori rilis baru dengan File Manager, lalu Extract. ZIP berisi folder server, operations, manifest, dan contoh environment. Pastikan File Manager menampilkan hidden files sehingga public/.htaccess terlihat.
 2. Salin production.env.example menjadi server/.env. Isi domain, koneksi database, dan APP_KEY. Gunakan APP_KEY baru hanya pada instalasi pertama. Simpan kunci yang sama pada pembaruan.
 3. Dari direktori server jalankan:
 

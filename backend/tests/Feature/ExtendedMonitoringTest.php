@@ -7,6 +7,107 @@ use Illuminate\Support\Facades\DB;
 
 class ExtendedMonitoringTest extends MonitoringTest
 {
+    public function test_backdated_increase_requires_review_against_the_next_period(): void
+    {
+        [$a,$region] = $this->activity();
+        [$first,$second] = $a['periods'];
+        $send = function ($period, $value, $version, $key, $reason = '') use ($region) {
+            return $this->withHeader('Idempotency-Key', $key)->postJson('/api/periods/'.$period['id'].'/realizations', ['rows' => [['region_id' => $region, 'value' => $value, 'version' => $version, 'position_date' => $period['position_date'], 'reason' => $reason]]]);
+        };
+        $send($first, '30', 0, 'history-first-001')->assertJsonPath('results.0.status', 'saved');
+        $send($second, '75', 0, 'history-second-001')->assertJsonPath('results.0.status', 'saved');
+        $pending = $send($first, '100', 1, 'history-first-002', 'Dokumen lama baru diverifikasi')->assertJsonPath('results.0.status', 'pending');
+        $this->assertDatabaseHas('realizations', ['period_id' => $first['id'], 'value' => 30, 'version' => 1]);
+        $this->postJson('/api/tickets/'.$pending->json('results.0.ticket_id').'/review', ['action' => 'approve', 'message' => 'Perbedaan antarperiode telah diverifikasi'])->assertOk();
+        $this->assertDatabaseHas('realizations', ['period_id' => $first['id'], 'value' => 100, 'version' => 2]);
+        $this->assertDatabaseHas('realizations', ['period_id' => $second['id'], 'value' => 75, 'version' => 1]);
+    }
+
+    public function test_reverse_entry_cannot_bypass_review_or_its_required_reason(): void
+    {
+        [$a,$region] = $this->activity();
+        [$first,$second] = $a['periods'];
+        $this->withHeader('Idempotency-Key', 'reverse-second-001')->postJson('/api/periods/'.$second['id'].'/realizations', ['rows' => [['region_id' => $region, 'value' => '75', 'version' => 0, 'position_date' => $second['position_date']]]])->assertJsonPath('results.0.status', 'saved');
+        $row = ['region_id' => $region, 'value' => '100', 'version' => 0, 'position_date' => $first['position_date']];
+        $this->withHeader('Idempotency-Key', 'reverse-first-001')->postJson('/api/periods/'.$first['id'].'/realizations', ['rows' => [$row]])->assertJsonPath('results.0.status', 'invalid');
+        $this->withHeader('Idempotency-Key', 'reverse-first-002')->postJson('/api/periods/'.$first['id'].'/realizations', ['rows' => [$row + ['reason' => 'Input historis perlu verifikasi']]])->assertJsonPath('results.0.status', 'pending');
+        $this->assertDatabaseMissing('realizations', ['period_id' => $first['id'], 'region_id' => $region]);
+    }
+
+    public function test_neighbor_validation_respects_official_values_during_open_corrections(): void
+    {
+        [$a,$region] = $this->activity();
+        [$first,$second] = $a['periods'];
+        $send = function ($period, $value, $version, $key) use ($region) {
+            return $this->withHeader('Idempotency-Key', $key)->postJson('/api/periods/'.$period['id'].'/realizations', ['rows' => [['region_id' => $region, 'value' => $value, 'version' => $version, 'position_date' => $period['position_date'], 'reason' => 'Verifikasi koreksi periode']]]);
+        };
+        $send($first, '30', 0, 'official-first-001')->assertJsonPath('results.0.status', 'saved');
+        $send($second, '75', 0, 'official-second-001')->assertJsonPath('results.0.status', 'saved');
+        $this->postJson('/api/periods/'.$second['id'].'/finalize', ['version' => 0])->assertCreated();
+        $this->postJson('/api/periods/'.$second['id'].'/reopen', ['reason' => 'Meninjau dokumen susulan'])->assertOk();
+        $send($second, '100', 1, 'official-second-002')->assertJsonPath('results.0.status', 'saved');
+        $send($first, '90', 1, 'official-first-002')->assertJsonPath('results.0.status', 'pending');
+        $this->getJson('/api/activities/'.$a['id'])->assertJsonPath('rows.0.cells.1.value', '75.0000');
+    }
+
+    public function test_active_configuration_cannot_drop_all_periods_or_participants(): void
+    {
+        [$a,$region,$admin,$data] = $this->activity();
+        $data['version'] = 2;
+        $data['reason'] = 'Perubahan konfigurasi aktif';
+        $this->putJson('/api/activities/'.$a['id'], array_replace($data, ['periods' => [], 'region_targets' => []]))->assertUnprocessable()->assertJsonValidationErrors('periods');
+        $withoutPeriods = $data;
+        $withoutPeriods['periods'] = [];
+        $withoutPeriods['region_targets'][0]['targets'] = [];
+        $this->putJson('/api/activities/'.$a['id'], $withoutPeriods)->assertUnprocessable();
+        $withoutRegions = $data;
+        $withoutRegions['region_targets'] = [];
+        $this->putJson('/api/activities/'.$a['id'], $withoutRegions)->assertUnprocessable()->assertJsonValidationErrors('region_targets');
+        $this->putJson('/api/activities/'.$a['id'], array_replace($data, ['periods' => [], 'region_targets' => []]))->assertUnprocessable();
+        $this->assertDatabaseHas('activities', ['id' => $a['id'], 'status' => 'AKTIF', 'version' => 2]);
+        $this->assertDatabaseCount('periods', 3);
+        $this->assertDatabaseHas('activity_regions', ['activity_id' => $a['id'], 'region_id' => $region, 'left_on' => null]);
+        $this->assertDatabaseCount('target_sets', 1);
+        $this->postJson('/api/activities/'.$a['id'].'/status', ['status' => 'SELESAI', 'version' => 2])->assertUnprocessable();
+    }
+
+    public function test_draft_start_changes_keep_initial_participation_in_sync(): void
+    {
+        [$a,$region,$admin,$data] = $this->activity();
+        $data['code'] = 'DRAFT-DATE';
+        $data['start_date'] = '2026-10-10';
+        array_shift($data['periods']);
+        array_shift($data['region_targets'][0]['targets']);
+        $draft = $this->postJson('/api/activities', $data)->assertCreated()->json('activity');
+        $data['version'] = 1;
+        $data['reason'] = 'Memajukan tanggal awal draf';
+        $data['start_date'] = '2026-10-01';
+        array_unshift($data['periods'], ['label' => 'Awal', 'position_date' => '2026-10-05', 'due_at' => '2026-10-06T17:00:00+08:00']);
+        array_unshift($data['region_targets'][0]['targets'], '40');
+        $this->putJson('/api/activities/'.$draft['id'], $data)->assertOk();
+        $this->assertDatabaseHas('activity_regions', ['activity_id' => $draft['id'], 'region_id' => $region, 'joined_on' => '2026-10-01']);
+        $active = $this->postJson('/api/activities/'.$draft['id'].'/status', ['status' => 'AKTIF', 'version' => 2])->assertOk()->assertJsonPath('rows.0.cells.0.status', 'BELUM_ADA_DATA');
+        $period = $active->json('periods.0');
+        $this->withHeader('Idempotency-Key', 'draft-eligibility-001')->postJson('/api/periods/'.$period['id'].'/realizations', ['rows' => [['region_id' => $region, 'value' => '30', 'version' => 0, 'position_date' => $period['position_date']]]])->assertJsonPath('results.0.status', 'saved');
+    }
+
+    public function test_empty_drafts_remain_editable_without_rewriting_active_participation(): void
+    {
+        [$a,$region,$admin,$data] = $this->activity();
+        $data['code'] = 'EMPTY-DRAFT';
+        $data['periods'] = [];
+        $data['region_targets'] = [];
+        $this->postJson('/api/activities', $data)->assertCreated()->assertJsonPath('activity.status', 'DRAF');
+        $joined = DB::table('activity_regions')->where('activity_id', $a['id'])->value('joined_on');
+        $data = $this->getJson('/api/activities/'.$a['id'])->json('activity');
+        $data['start_date'] = '2026-10-02';
+        $data['version'] = 2;
+        $data['reason'] = 'Mengubah rentang kegiatan aktif';
+        $data['region_targets'] = [['region_id' => $region, 'final_target' => '140', 'targets' => ['40', '100', '140']]];
+        $this->putJson('/api/activities/'.$a['id'], $data)->assertOk();
+        $this->assertDatabaseHas('activity_regions', ['activity_id' => $a['id'], 'region_id' => $region, 'joined_on' => $joined]);
+    }
+
     public function test_malformed_number_is_a_row_validation_error_and_partial_batch_is_retained(): void
     {
         [$a,$region] = $this->activity();
@@ -51,17 +152,22 @@ class ExtendedMonitoringTest extends MonitoringTest
     {
         [$a,$region,$admin,$data] = $this->activity();
         $this->travelTo(now()->setDate(2026, 10, 5));
+        $other = DB::table('regions')->insertGetId(['code' => 'REMAINING', 'name' => 'Peserta tetap', 'is_active' => true]);
+        $data['version'] = 2;
+        $data['reason'] = 'Menambah peserta sebelum evaluasi';
+        $data['region_targets'][] = ['region_id' => $other, 'final_target' => '140', 'targets' => ['40', '100', '140']];
+        $this->putJson('/api/activities/'.$a['id'], $data)->assertOk();
         $p = $a['periods'][0]['id'];
         $this->postJson("/api/periods/$p/finalize", ['version' => 0])->assertCreated();
-        $data['version'] = 2;
+        $data['version'] = 3;
         $data['reason'] = 'Peserta tidak ikut berikutnya';
-        $data['region_targets'] = [];
+        $data['region_targets'] = [$data['region_targets'][1]];
         $this->putJson('/api/activities/'.$a['id'], $data)->assertOk();
-        $this->getJson('/api/dashboard')->assertJsonPath('summary.total', 1)->assertJsonPath('units.0.region_id', $region);
+        $this->getJson('/api/dashboard')->assertJsonPath('summary.total', 2)->assertJsonPath('units.0.region_id', $region);
         $this->postJson("/api/periods/$p/reopen", ['reason' => 'Koreksi setelah peserta keluar'])->assertOk();
         $this->withHeader('Idempotency-Key', 'removed-correction-001')->postJson("/api/periods/$p/realizations", ['rows' => [['region_id' => $region, 'value' => '40', 'version' => 0, 'position_date' => '2026-10-05']]])->assertJsonPath('results.0.status', 'saved');
         $this->postJson("/api/periods/$p/finalize", ['version' => 2])->assertCreated();
-        $this->getJson('/api/dashboard')->assertOk()->assertJsonPath('summary.total', 1)->assertJsonPath('summary.attained', 1);
+        $this->getJson('/api/dashboard')->assertOk()->assertJsonPath('summary.total', 2)->assertJsonPath('summary.attained', 1);
     }
 
     public function test_cancel_then_archive_preserves_past_but_does_not_resurrect_future(): void

@@ -1,5 +1,7 @@
 # Hasil verifikasi rilis 1.0.0-rc.1
 
+Catatan pembaruan 18 Oktober 2026: perbaikan terbaru dan hasil pengujian rc.2 tercatat pada [changes-rc2.md](changes-rc2.md). Angka performa di bawah adalah bukti historis rc.1; pengujian beban hosting tujuan tetap terpisah.
+
 Tanggal pemeriksaan: 17 Oktober 2026, WITA. Status: kandidat rilis P0 untuk pemasangan dan UAT cPanel. Layanan produksi belum diterapkan. Tidak ada data organisasi atau kredensial produksi pada paket.
 
 ## Lingkungan dan hasil

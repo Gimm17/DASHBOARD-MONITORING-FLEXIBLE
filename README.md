@@ -50,10 +50,10 @@ Pada Windows, `./scripts/check.ps1` menjalankan build, audit, pemeriksaan format
 `npm run test:browser` memakai Chrome dan data demo lokal. Sediakan akun uji melalui dmf:admin dengan DMF_TEST_EMAIL/DMF_TEST_PASSWORD sesuai test, atau gunakan akun uji default yang tertulis di tests/browser. Kredensial tersebut hanya untuk database pengujian terisolasi dan tidak dibuat oleh rilis produksi.
 
 ```text
-npm run release -- 1.0.0-rc.1
+npm run release -- 1.0.0-rc.2
 ```
 
-Hasilnya `release/dmf-1.0.0-rc.1.zip`, hash arsip, dan folder rilis dengan vendor produksi, aset, manifest serta panduan. Skrip menolak menimpa versi. Isi paket tidak membawa .env, database lokal atau akun demo.
+Hasilnya `release/dmf-1.0.0-rc.2.zip`, hash arsip, dan folder rilis dengan vendor produksi, aset, manifest serta panduan. Skrip menolak menimpa versi. Isi paket tidak membawa .env, database lokal atau akun demo.
 
 ## Dokumentasi
 
