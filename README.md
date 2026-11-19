@@ -1,71 +1,51 @@
-# BPS Dashboard Monitoring Flexible (DMF)
+# BPS Dashboard Monitoring Flexible
 
-> **Sistem Pemantauan Terpadu Target & Realisasi Kegiatan BPS Se-Provinsi**  
-> Didesain berdasarkan spesifikasi **PRD v1.0**, **Implementation Plan**, dan tema visual modern **Shopeers (Dribbble)**.
+> [!NOTE]
+> **Live Application:** [`https://bps-dashflex.pinnhost.my.id/`](https://bps-dashflex.pinnhost.my.id/)
 
----
+Platform pemantauan capaian kegiatan statistik multi-wilayah untuk BPS. **Vue 3 + TypeScript** menangani antarmuka reaktif dan grafik tren; **Laravel 13** menangani autentikasi sesi, cakupan peran, idempotensi batch, snapshot resmi berversi, serta audit trail.
 
-## 🎨 Palet Warna Resmi
-- **Deep Navy (`#1A3263`)**: Brand utama, tombol aksi primer, active navigation pill, heading utama.
-- **Slate Blue (`#547792`)**: Sub-headers, grid garis, header tabel, icon sekunder, border kartu.
-- **Warm Gold Accent (`#FFC570`)**: Highlight metrik, busur aktif speedometer, badge perhatian.
-- **Soft Sand Cream (`#EFD2B0`)**: Latar belakang kartu ringkasan, pill tags, zebra striping.
+![Dashboard Monitoring Eksekutif](docs/screenshots/live-dashboard.webp)
 
----
-
-## 🚀 Fitur Utama Frontend
-
-1. **Dashboard Monitoring Eksekutif**:
-   - 4 Stat Cards KPI dengan pill tren mini (`▲ 15.5% vs periode lalu`).
-   - Hero Spline Area Chart bergradasi dengan interactive tooltip dan 3-segment color breakdown bar (Sosial, Produksi, Nerwilis/Distribusi).
-   - Aktivitas Laporan Mingguan (Bar chart dengan penanda puncak hari pengiriman laporan).
-   - Speedometer Radial Gauge (Busur radial 180° simetris dengan segmented ticks).
-   - DMF AI Assistant (Kartu asisten interaktif dengan bola 3D gradasi Navy-Gold).
-   - Tabel Kinerja Kegiatan & Wilayah dengan filter tim kerja.
-
-2. **Matriks Evaluasi Wilayah**:
-   - **Sticky Freeze Column** untuk kolom *Kabupaten / Kota* saat digeser secara horizontal.
-   - Sel metrik ganda: Realisasi kumulatif terhadap target (`105 / 100`) dan badge status ketercapaian (`105.0% ✓` atau `87.5% ⚠️`), serta penanda keterlambatan (`⏰ WITA`).
-   - Footer agregat provinsi dengan perhitungan pembobotan volume murni sesuai aturan **BR-06**.
-
-3. **Input Realisasi Batch**:
-   - Spreadsheet 20 baris per batch untuk penginputan cepat operator provinsi.
-   - Validasi otomatis penurunan kumulatif (**BR-07**) yang memicu modal justifikasi resmi.
-   - Sticky bottom bar konfirmasi simpan data ber-audit log.
-
-4. **Modul Audit Trail & Koreksi**:
-   - Log jejak perubahan nilai (*before/after*, operator, timestamp, dan alasan).
-   - Review tiket koreksi via drawer samping.
-   - Pratinjau cetak resmi Berita Acara Koreksi dalam format kop surat BPS Provinsi.
-
-5. **Slide-Over Drawer Tambah Widget**:
-   - Katalog widget modular dengan tag filter (`#Performa`, `#Wilayah`, `#Jadwal`, `#Prioritas`).
-
----
-
-## 🛠️ Tech Stack
-- **Frontend Framework**: Vue 3 (Composition API) + TypeScript
-- **Styling**: Tailwind CSS
-- **Build Tool**: Vite
-- **Icons & Fonts**: Google Fonts (*Outfit*, *Manrope*) & *Material Symbols Outlined*
-
----
-
-## 💻 Cara Menjalankan
-
-### 1. Instalasi Dependensi
-```bash
-npm install
+```text
+[Admin / PJK] ──► Konfigurasi Kegiatan & Jadwal (Harian / Mingguan / Bulanan / Triwulanan)
+       │
+       ▼
+[Operator Provinsi] ──► Batch Input (≤20 baris, idempotent key) ──► [Snapshot Resmi Berversi]
+                                                                            │
+                                                      ┌─────────────────────┴─────────────────────┐
+                                                      ▼                                           ▼
+                                          [Tiket Koreksi & Approval]                 [Ekspor CSV & Audit Log]
 ```
 
-### 2. Menjalankan Server Development
-```bash
-npm run dev
-```
-Akses di browser pada: **http://localhost:5173/**
+### Arsitektur & Stack
 
-### 3. Build Produksi
+| Komponen | Teknologi | Fungsi |
+| :--- | :--- | :--- |
+| **Frontend** | Vue 3.5, TypeScript, Tailwind CSS v4 | Dashboard eksekutif, matriks wilayah, gauge kelengkapan |
+| **Backend API** | Laravel 13, PHP 8.4+ | Sesi & CSRF, otorisasi peran, snapshot & tiket revisi |
+| **Database** | MySQL (Production) · SQLite (Local/Test) | Penyimpanan realisasi desimal presisi & log perubahan |
+| **Verification** | PHPUnit + Playwright Browser E2E | Validasi kontrak API, alur realisasi, & layout responsif |
+
+<details>
+<summary><b>Menjalankan Lokal, Test &amp; Build Rilis</b></summary>
+
+```bash
+npm ci
+composer install --working-dir=backend
+cp backend/.env.example backend/.env
+cd backend && php artisan key:generate && php artisan migrate
+php artisan dmf:admin admin@dmf.test --name="Administrator"
+php artisan dmf:demo
+```
+
+Build SPA & jalankan server lokal:
+
 ```bash
 npm run build
+php artisan serve --host=127.0.0.1 --port=8000
 ```
-Hasil build siap disajikan di folder `dist/`.
+
+Verifikasi Windows: `./scripts/check.ps1 -Browser` · Dokumen lengkap tersedia di [`docs/`](docs/operations/production.md).
+
+</details>
